@@ -29,6 +29,14 @@ userRouter.post('/create', async (req: Request, res: Response) => {
 
 userRouter.get('/:id', async (req: Request, res: Response) => {
     const { id } = req.params;
+
+    const user = await prisma.users.findFirst({
+        where: {
+            user_id: parseInt(id)
+        }
+    });
+
+    res.send({status: true, user: user});
 });
 
 // userRouter.post('/login', (req: Request, res: Response) => {
