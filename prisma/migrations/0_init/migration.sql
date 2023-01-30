@@ -9,7 +9,7 @@ CREATE TABLE `scrapbook` (
 
 -- CreateTable
 CREATE TABLE `users` (
-    `user_id` INTEGER NOT NULL AUTO_INCREMENT,
+    `user_id` INTEGER NOT NULL UNIQUE AUTO_INCREMENT,
     `user_firstname` VARCHAR(255) NOT NULL,
     `user_lastname` VARCHAR(255) NOT NULL,
     `user_email` VARCHAR(255) NOT NULL,

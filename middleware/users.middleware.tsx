@@ -31,16 +31,8 @@ const getHashedPassword_async = async function (unhashed_password: string) {
     return hashed_password;
 };
 
-const checkPassword = (unhashed_password: string, hashed_password: string) => {
-    bcrypt.compare(unhashed_password, hashed_password, (err, same) => {
-        if (err) {
-            console.error(err);
-            return false;
-        }
-
-        console.log(`Password check: ${same}`);
-        return same;
-    });
+const checkPassword = async (unhashed_password: string, hashed_password: string) => {
+    return await bcrypt.compare(unhashed_password, hashed_password);
 };
 
-export { getHashedPassword, getHashedPassword_async };
+export { getHashedPassword, getHashedPassword_async, checkPassword };
