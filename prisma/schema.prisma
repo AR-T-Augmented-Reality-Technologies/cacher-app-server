@@ -1,0 +1,114 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model scrapbook {
+  scrapbook_id String      @id @unique(map: "scrapbook_id") @db.VarChar(255)
+  location     String      @db.VarChar(255)
+  managed_by   managed_by?
+  pages        pages[]
+}
+
+model users {
+  user_id        Int           @id @default(autoincrement())
+  user_firstname String        @db.VarChar(255)
+  user_lastname  String        @db.VarChar(255)
+  user_email     String        @db.VarChar(255)
+  user_password  String        @db.VarChar(255)
+  ages           ages[]
+  managed_by     managed_by[]
+  roles          roles[]
+  uploaded_by    uploaded_by[]
+}
+
+model ages {
+  id      Int      @id @default(autoincrement())
+  user_id Int
+  dob     DateTime @db.Date
+  age     Int
+  users   users    @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "ages_ibfk_1")
+
+  @@index([user_id], map: "user_id")
+}
+
+model image {
+  photo_id     String        @id @db.VarChar(255)
+  image        String        @db.VarChar(255)
+  likes        Int
+  comments     String        @db.VarChar(255)
+  num_comments Int
+  caption      String        @db.VarChar(255)
+  upload_date  DateTime      @db.Date
+  uploaded_by  uploaded_by[]
+}
+
+model managed_by {
+  id           Int       @id @default(autoincrement())
+  scrapbook_id String    @unique(map: "scrapbook_id") @db.VarChar(255)
+  user_id      Int
+  scrapbook    scrapbook @relation(fields: [scrapbook_id], references: [scrapbook_id], onDelete: NoAction, onUpdate: NoAction, map: "managed_by_ibfk_1")
+  users        users     @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "managed_by_ibfk_2")
+
+  @@index([user_id], map: "user_id")
+}
+
+model page {
+  page_id         String         @id @db.VarChar(255)
+  page_collection String         @db.VarChar(255)
+  pages           pages          @relation(fields: [page_collection], references: [page_collection], onDelete: NoAction, onUpdate: NoAction, map: "page_ibfk_1")
+  page_options    page_options[]
+
+  @@index([page_collection], map: "page_collection")
+}
+
+model page_options {
+  id               Int    @id @default(autoincrement())
+  page_id          String @db.VarChar(255)
+  page_title       String @db.VarChar(255)
+  background_color String @db.VarChar(7)
+  orientation      String @db.VarChar(255)
+  page             page   @relation(fields: [page_id], references: [page_id], onDelete: NoAction, onUpdate: NoAction, map: "page_options_ibfk_1")
+
+  @@index([page_id], map: "page_id")
+}
+
+model pages {
+  page_collection String    @id @db.VarChar(255)
+  scrapbook_id    String    @db.VarChar(255)
+  number_of_pages Int
+  page            page[]
+  scrapbook       scrapbook @relation(fields: [scrapbook_id], references: [scrapbook_id], onDelete: NoAction, onUpdate: NoAction, map: "pages_ibfk_1")
+
+  @@index([scrapbook_id], map: "scrapbook_id")
+}
+
+model preoccupied {
+  location String @id @db.VarChar(255)
+}
+
+model roles {
+  id                Int    @id @default(autoincrement())
+  user_id           Int
+  roles_name        String @db.VarChar(255)
+  roles_serialized  String @db.VarChar(255)
+  roles_description String @db.VarChar(255)
+  users             users  @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "roles_ibfk_1")
+
+  @@index([user_id], map: "user_id")
+}
+
+model uploaded_by {
+  id       Int    @id @default(autoincrement())
+  photo_id String @db.VarChar(255)
+  user_id  Int
+  image    image  @relation(fields: [photo_id], references: [photo_id], onDelete: NoAction, onUpdate: NoAction, map: "uploaded_by_ibfk_1")
+  users    users  @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "uploaded_by_ibfk_2")
+
+  @@index([photo_id], map: "photo_id")
+  @@index([user_id], map: "user_id")
+}

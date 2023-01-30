@@ -1,5 +1,9 @@
 // Users middleware methods
 import bcrypt from 'bcrypt';
+import { PrismaClient } from '@prisma/client'
+
+// Create our PRISMA Client
+const prisma = new PrismaClient()
 
 const getHashedPassword = (unhashed_password: string) => {
     const hashed_password = bcrypt.genSalt(10, (err, salt) => {
@@ -14,7 +18,7 @@ const getHashedPassword = (unhashed_password: string) => {
                 return "";
             }
 
-            //console.log(encrypted);
+            // console.log(encrypted);
             return encrypted;
         });
     }); 
