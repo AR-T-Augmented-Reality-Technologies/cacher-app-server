@@ -1,21 +1,34 @@
 import { Router, Request, Response } from "express";
 import { getHashedPassword_async } from "../middleware/users.middleware";
-// TODO: import our database connection
+import { PrismaClient } from '@prisma/client'
+
+// Create our PRISMA Client
+const prisma = new PrismaClient()
 
 const userRouter: Router = Router();
 
 userRouter.post('/create', async (req: Request, res: Response) => {
-    const { email, username, password } = req.body
+    const { firstname, lastname, email, password } = req.body;
 
     // Create password hash.
-    // const hashedPassword = getHashedPassword(password);
     const hashedPassword = await getHashedPassword_async(password);
-    console.log(`after getHashedPassword(): ${hashedPassword}`);
 
-    // Create a JWT Token for Bearer Authorization.
+    // TODO: Create a JWT Token for Bearer Authorization. -- maybe only on login
     
-    // Insert the new user to the database.
-    res.send({ status: true, password: hashedPassword});
+    const newUser = await prisma.users.create({
+        data: {
+            user_firstname: firstname,
+            user_lastname: lastname,
+            user_email: email,
+            user_password: hashedPassword
+        }
+    });
+
+    res.send({ status: true, user: newUser });
+});
+
+userRouter.get('/:id', async (req: Request, res: Response) => {
+    const { id } = req.params;
 });
 
 // userRouter.post('/login', (req: Request, res: Response) => {
