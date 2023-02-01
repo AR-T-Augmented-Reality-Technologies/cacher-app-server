@@ -15,11 +15,12 @@ model scrapbook {
 }
 
 model users {
-  user_id        Int           @id @default(autoincrement())
+  user_id        Int           @id @unique @default(autoincrement())
   user_firstname String        @db.VarChar(255)
   user_lastname  String        @db.VarChar(255)
   user_email     String        @db.VarChar(255)
   user_password  String        @db.VarChar(255)
+  user_username  String        @default("guest") @db.VarChar(255)
   ages           ages[]
   managed_by     managed_by[]
   roles          roles[]

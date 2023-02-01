@@ -1,6 +1,7 @@
 import { Router, Request, Response } from "express";
-import { getHashedPassword_async, checkPassword, generateAccessToken } from "../middleware/users.middleware";
+import { getHashedPassword_async, checkPassword, generateAccessToken, authenticateToken } from "../middleware/users.middleware";
 import { PrismaClient } from '@prisma/client'
+import { calculateUserAge } from "../helpers/users.helper";
 
 // Create our PRISMA Client
 const prisma = new PrismaClient()
@@ -8,26 +9,35 @@ const prisma = new PrismaClient()
 const userRouter: Router = Router();
 
 userRouter.post('/create', async (req: Request, res: Response) => {
-    const { firstname, lastname, email, password } = req.body;
+    const { firstname, lastname, email, password, dob, username } = req.body;
 
     // Create password hash.
     const hashedPassword = await getHashedPassword_async(password);
 
-    // TODO: Create a JWT Token for Bearer Authorization. -- maybe only on login
-    
+    // Create 
     const newUser = await prisma.users.create({
         data: {
             user_firstname: firstname,
             user_lastname: lastname,
             user_email: email,
-            user_password: hashedPassword
+            user_password: hashedPassword,
+            user_username: username
         }
     });
 
-    res.json({ status: true, user: newUser });
+    // Create age record
+    const newAge = await prisma.ages.create({
+        data: {
+            user_id: newUser.user_id,
+            dob: new Date(dob),
+            age: calculateUserAge(dob)
+        }
+    });
+
+    res.json({ status: true, user: newUser, newAge: newAge });
 });
 
-userRouter.get('/:id', async (req: Request, res: Response) => {
+userRouter.get('/:id', authenticateToken,  async (req: Request, res: Response) => {
     const { id } = req.params;
 
     // Get the User
@@ -56,7 +66,7 @@ userRouter.get('/:id', async (req: Request, res: Response) => {
 
 userRouter.post('/login', async (req: Request, res: Response) => {
     const { email, username, password_unhashed } = req.body;
-    const accessToken: string = "";
+    var accessToken: string = "";
 
     // Get the password hash from database
     const password_hash = await prisma.users.findFirst({
@@ -67,6 +77,13 @@ userRouter.post('/login', async (req: Request, res: Response) => {
             user_password: true
         }
     });
+
+    setTimeout(() => { console.log('timeout'); }, 2000);
+
+    if(password_hash == null) {
+        console.log("password has is null!");
+        res.sendStatus(403);
+    }
 
     // Check passwords using salt
     const check = await checkPassword(password_unhashed, password_hash.user_password);

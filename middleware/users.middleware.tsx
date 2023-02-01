@@ -1,6 +1,7 @@
 // Users middleware methods
 import bcrypt from 'bcrypt';
-import { verify, sign } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
+import { Request, Response } from "express";
 
 const getHashedPassword = (unhashed_password: string) => {
     const hashed_password = bcrypt.genSalt(10, (err, salt) => {
@@ -15,7 +16,7 @@ const getHashedPassword = (unhashed_password: string) => {
                 return "";
             }
 
-            // console.log(encrypted);
+            console.log(encrypted);
             return encrypted;
         });
     }); 
@@ -36,9 +37,33 @@ const checkPassword = async (unhashed_password: string, hashed_password: string)
     return await bcrypt.compare(unhashed_password, hashed_password);
 };
 
-const generateAccessToken = (username: string) => {
-    return sign(username, process.env.TOKEN_SECRET, { expiresIn: '1800s' });
-  }
+const generateAccessToken = (user: any) => {
+    return jwt.sign(user, process.env.TOKEN_SECRET, { expiresIn: '1800s' });
+}
+
+const authenticateToken = (req: Request, res: Response, next) => {
+    const authHeader: string = req.headers['Authorization'];
+    console.log(authHeader);
+    const token: string = authHeader && authHeader.split(' ')[1];
+    console.log(token);
+
+    if(token == null) return res.sendStatus(401);
+
+    jwt.verify(token, process.env.TOKEN_SECRET as string, (err: any, user: any) => {
+        console.log(err);
+        if(err) return res.sendStatus(403);
+
+        req.user = user;
+
+        next();
+    });
+ };
   
 
-export { getHashedPassword, getHashedPassword_async, checkPassword, generateAccessToken };
+export { 
+    getHashedPassword, 
+    getHashedPassword_async, 
+    checkPassword, 
+    generateAccessToken,
+    authenticateToken
+};
