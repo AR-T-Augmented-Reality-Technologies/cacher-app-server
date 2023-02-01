@@ -68,31 +68,31 @@ usersRoutes.get('/:id',  async (req: Request, res: Response) => {
 
 usersRoutes.post('/login', async (req: Request, res: Response) => {
     const { email, password_unhashed } = req.body;
-    var accessToken: string = "";
-
-    console.log("Starting /login");
 
     // Get the password hash from database
-    const user = await prisma.users.findFirst({
+    prisma.users.findFirst({
         where: {
             user_email: email as string
         },
         select: {
             user_password: true
         }
-    });
+    })
+    .then(async (user) => {
+        console.log("Got user: " + user);
 
-    console.log("Got user: " + user);
+        // Check passwords using salt
+        const check = await checkPassword(password_unhashed, user.user_password);
 
-    // Check passwords using salt
-    const check = await checkPassword(password_unhashed, user.user_password);
+        if (!check) {
+            res.sendStatus(403);
+        }
 
-    if (check) {
         // Create access token
-        accessToken = generateAccessToken({ email: email });
-    }
+        const accessToken = generateAccessToken({ email: email });
 
-    res.json({status: check, data: { success: check, token: accessToken || ""}});
+        res.json({status: check, data: { success: check, token: accessToken || ""}});
+    });
 });
 
 export default usersRoutes;
