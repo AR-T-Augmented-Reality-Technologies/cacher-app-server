@@ -73,9 +73,6 @@ usersRoutes.post('/login', async (req: Request, res: Response) => {
     prisma.users.findFirst({
         where: {
             user_email: email as string
-        },
-        select: {
-            user_password: true
         }
     })
     .then(async (user) => {
@@ -91,7 +88,7 @@ usersRoutes.post('/login', async (req: Request, res: Response) => {
         // Create access token
         const accessToken = generateAccessToken({ email: email });
 
-        res.json({status: check, data: { success: check, token: accessToken || ""}});
+        res.json({status: check, data: { success: check, user: user, token: accessToken || ""}});
     });
 });
 
