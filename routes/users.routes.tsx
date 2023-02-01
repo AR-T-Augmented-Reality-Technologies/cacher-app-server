@@ -75,7 +75,7 @@ usersRoutes.post('/login', async (req: Request, res: Response) => {
     // Get the password hash from database
     const user = await prisma.users.findFirst({
         where: {
-            user_email: email
+            user_email: email as string
         },
         select: {
             user_password: true
