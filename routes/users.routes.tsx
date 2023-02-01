@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import { getHashedPassword_async, checkPassword } from "../middleware/users.middleware";
+import { getHashedPassword_async, checkPassword, generateAccessToken } from "../middleware/users.middleware";
 import { PrismaClient } from '@prisma/client'
 
 // Create our PRISMA Client
@@ -56,6 +56,7 @@ userRouter.get('/:id', async (req: Request, res: Response) => {
 
 userRouter.post('/login', async (req: Request, res: Response) => {
     const { email, username, password_unhashed } = req.body;
+    const accessToken: string = "";
 
     // Get the password hash from database
     const password_hash = await prisma.users.findFirst({
@@ -70,7 +71,12 @@ userRouter.post('/login', async (req: Request, res: Response) => {
     // Check passwords using salt
     const check = await checkPassword(password_unhashed, password_hash.user_password);
 
-    res.json({status: check, data: { success: check, token: "", refresh_token: ""}});
+    if (check) {
+        // Create access token
+        accessToken = generateAccessToken({ username: username });
+    }
+
+    res.json({status: check, data: { success: check, token: accessToken}});
 });
 
 export default userRouter;

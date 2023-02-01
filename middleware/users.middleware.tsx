@@ -1,5 +1,6 @@
 // Users middleware methods
 import bcrypt from 'bcrypt';
+import { verify, sign } from "jsonwebtoken";
 
 const getHashedPassword = (unhashed_password: string) => {
     const hashed_password = bcrypt.genSalt(10, (err, salt) => {
@@ -35,4 +36,9 @@ const checkPassword = async (unhashed_password: string, hashed_password: string)
     return await bcrypt.compare(unhashed_password, hashed_password);
 };
 
-export { getHashedPassword, getHashedPassword_async, checkPassword };
+const generateAccessToken = (username: string) => {
+    return sign(username, process.env.TOKEN_SECRET, { expiresIn: '1800s' });
+  }
+  
+
+export { getHashedPassword, getHashedPassword_async, checkPassword, generateAccessToken };
