@@ -2,12 +2,12 @@ import { Router } from "express";
 
 // Import our other routes
 import mapRoutes from "./map.routes";
-import usersRouters from "./users.routes";
+import usersRoutes from "./users.routes";
 
 const apiRouter: Router = Router();
 
 // add the API routes
 apiRouter.use('/map', mapRoutes);
-apiRouter.use('/users', usersRouters);
+apiRouter.use('/users', usersRoutes);
 
 export default apiRouter;

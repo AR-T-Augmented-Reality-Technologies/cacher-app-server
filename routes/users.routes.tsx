@@ -6,9 +6,9 @@ import { calculateUserAge } from "../helpers/users.helper";
 // Create our PRISMA Client
 const prisma = new PrismaClient()
 
-const userRouter: Router = Router();
+const usersRoutes: Router = Router();
 
-userRouter.post('/create', async (req: Request, res: Response) => {
+usersRoutes.post('/create', async (req: Request, res: Response) => {
     const { firstname, lastname, email, password, dob, username } = req.body;
 
     // Create password hash.
@@ -37,7 +37,7 @@ userRouter.post('/create', async (req: Request, res: Response) => {
     res.json({ status: true, user: newUser, newAge: newAge });
 });
 
-userRouter.get('/:id',  async (req: Request, res: Response) => {
+usersRoutes.get('/:id',  async (req: Request, res: Response) => {
     const { id } = req.params;
 
     // Get the User
@@ -66,9 +66,11 @@ userRouter.get('/:id',  async (req: Request, res: Response) => {
     res.json({status: true, user: user, age: age, roles: roles});
 });
 
-userRouter.post('/login', async (req: Request, res: Response) => {
-    const { email, username, password_unhashed } = req.body;
+usersRoutes.post('/login', async (req: Request, res: Response) => {
+    const { email, password_unhashed } = req.body;
     var accessToken: string = "";
+
+    console.log("Starting /login");
 
     // Get the password hash from database
     const user = await prisma.users.findFirst({
@@ -80,7 +82,7 @@ userRouter.post('/login', async (req: Request, res: Response) => {
         }
     });
 
-    console.log(user);
+    console.log("Got user: " + user);
 
     // Check passwords using salt
     const check = await checkPassword(password_unhashed, user.user_password);
@@ -93,4 +95,4 @@ userRouter.post('/login', async (req: Request, res: Response) => {
     res.json({status: check, data: { success: check, token: accessToken || ""}});
 });
 
-export default userRouter;
+export default usersRoutes;

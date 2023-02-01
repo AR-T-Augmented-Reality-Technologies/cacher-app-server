@@ -1,9 +1,9 @@
 import { Router, Request, Response } from "express";
 
-const router: Router = Router();
+const mapRoutes: Router = Router();
 
-router.get('', (req: Request, res: Response) => {
+mapRoutes.get('', (req: Request, res: Response) => {
     res.send("...");
 })
 
-export default router;
+export default mapRoutes;
