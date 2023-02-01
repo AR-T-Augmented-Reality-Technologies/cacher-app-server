@@ -92,4 +92,17 @@ usersRoutes.post('/login', async (req: Request, res: Response) => {
     });
 });
 
+usersRoutes.delete('/:id', async (req: Request, res: Response)  => {
+    const { id } = req.params;
+
+    // Delete user from database
+    const deleted_record = await prisma.users.delete({
+        where: {
+            user_id: parseInt(id)
+        }
+    });
+
+    res.json({status: true, data: { msg: "User sucessfully deleted!", deleted_user: deleted_record }});
+});
+
 export default usersRoutes;
