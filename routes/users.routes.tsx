@@ -37,7 +37,7 @@ userRouter.post('/create', async (req: Request, res: Response) => {
     res.json({ status: true, user: newUser, newAge: newAge });
 });
 
-userRouter.get('/:id', authenticateToken,  async (req: Request, res: Response) => {
+userRouter.get('/:id',  async (req: Request, res: Response) => {
     const { id } = req.params;
 
     // Get the User
@@ -61,6 +61,8 @@ userRouter.get('/:id', authenticateToken,  async (req: Request, res: Response) =
         }
     });
 
+    console.log({status: true, user: user, age: age, roles: roles});
+
     res.json({status: true, user: user, age: age, roles: roles});
 });
 
@@ -69,27 +71,26 @@ userRouter.post('/login', async (req: Request, res: Response) => {
     var accessToken: string = "";
 
     // Get the password hash from database
-    const password_hash = prisma.users.findFirst({
+    const user = await prisma.users.findFirst({
         where: {
             user_email: email
         },
         select: {
             user_password: true
         }
-    })
-    .then(async (data) => {
-        const { user_password } = data;
-
-        // Check passwords using salt
-        const check = await checkPassword(password_unhashed, user_password);
-
-        if (check) {
-            // Create access token
-            accessToken = generateAccessToken({ email: email });
-        }
-
-        res.json({status: check, data: { success: check, token: accessToken || ""}});
     });
+
+    console.log(user);
+
+    // Check passwords using salt
+    const check = await checkPassword(password_unhashed, user.user_password);
+
+    if (check) {
+        // Create access token
+        accessToken = generateAccessToken({ email: email });
+    }
+
+    res.json({status: check, data: { success: check, token: accessToken || ""}});
 });
 
 export default userRouter;
