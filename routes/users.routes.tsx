@@ -85,18 +85,11 @@ userRouter.post('/login', async (req: Request, res: Response) => {
 
         if (check) {
             // Create access token
-            accessToken = generateAccessToken({ username: username });
+            accessToken = generateAccessToken({ email: email });
         }
 
-        res.json({status: check, data: { success: check, token: accessToken}});
+        res.json({status: check, data: { success: check, token: accessToken || ""}});
     });
-
-    setTimeout(() => { console.log('timeout'); }, 2000);
-
-    if(password_hash == null) {
-        console.log("password has is null!");
-        res.sendStatus(403);
-    }
 });
 
 export default userRouter;
