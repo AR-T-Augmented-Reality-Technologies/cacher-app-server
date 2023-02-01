@@ -95,6 +95,13 @@ usersRoutes.post('/login', async (req: Request, res: Response) => {
 usersRoutes.delete('/:id', async (req: Request, res: Response)  => {
     const { id } = req.params;
 
+    // Delete related records first
+    const delted_age = await prisma.ages.delete({
+        where: {
+            user_id: parseInt(id)
+        }
+    });
+
     // Delete user from database
     const deleted_record = await prisma.users.delete({
         where: {
