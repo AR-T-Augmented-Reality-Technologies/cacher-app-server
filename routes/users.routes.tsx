@@ -69,13 +69,26 @@ userRouter.post('/login', async (req: Request, res: Response) => {
     var accessToken: string = "";
 
     // Get the password hash from database
-    const password_hash = await prisma.users.findFirst({
+    const password_hash = prisma.users.findFirst({
         where: {
             user_email: email
         },
         select: {
             user_password: true
         }
+    })
+    .then(async (data) => {
+        const { user_password } = data;
+
+        // Check passwords using salt
+        const check = await checkPassword(password_unhashed, user_password);
+
+        if (check) {
+            // Create access token
+            accessToken = generateAccessToken({ username: username });
+        }
+
+        res.json({status: check, data: { success: check, token: accessToken}});
     });
 
     setTimeout(() => { console.log('timeout'); }, 2000);
@@ -84,16 +97,6 @@ userRouter.post('/login', async (req: Request, res: Response) => {
         console.log("password has is null!");
         res.sendStatus(403);
     }
-
-    // Check passwords using salt
-    const check = await checkPassword(password_unhashed, password_hash.user_password);
-
-    if (check) {
-        // Create access token
-        accessToken = generateAccessToken({ username: username });
-    }
-
-    res.json({status: check, data: { success: check, token: accessToken}});
 });
 
 export default userRouter;
