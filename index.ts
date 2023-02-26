@@ -18,8 +18,9 @@ const allowlist = ['http://localhost:3000', 'localhost', 'http://127.0.0.1:3000'
 
 const corsOptionsDelegate = (req: Request, callback: any) => {
   let corsOptions;
+    const request_origin: string = req.header('Origin') as string | "http://localhost:3000/";
 
-  if (-1 !== allowlist.indexOf(req.header('Origin'))) {
+  if (-1 !== allowlist.indexOf(request_origin)) {
     corsOptions = { origin: true }
   } else {
     corsOptions = { origin: false }
