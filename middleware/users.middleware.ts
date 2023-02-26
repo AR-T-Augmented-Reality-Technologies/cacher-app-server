@@ -18,37 +18,37 @@ const getHashedPassword = (unhashed_password: string) => {
                 return "";
             }
 
-            console.log(encrypted);
-            return encrypted;
-        });
+        console.log(encrypted);
+        return encrypted;
     });
+});
 
-    return hashed_password;
+return hashed_password;
 };
 
 const getHashedPassword_async = async function (unhashed_password: string) {
-    // Generate salt
-    const salt = await bcrypt.genSalt(10);
+// Generate salt
+const salt = await bcrypt.genSalt(10);
 
-    const hashed_password = await bcrypt.hash(unhashed_password, salt);
+const hashed_password = await bcrypt.hash(unhashed_password, salt);
 
-    return hashed_password;
+return hashed_password;
 };
 
 const checkPassword = async (unhashed_password: string, hashed_password: string) => {
-    return await bcrypt.compare(unhashed_password, hashed_password);
+return await bcrypt.compare(unhashed_password, hashed_password);
 };
 
 const generateAccessToken = (user: any) => {
-    // Check token exists
-    if (process.env.TOKEN_SECRET == undefined ||  process.env.TOKEN_SECRET == null) {
-        console.log("TOKEN_SECRET not loaded!! please check this.");
-    } else {
-        jwt.sign(user, process.env.TOKEN_SECRET, { expiresIn: '1800s' });
-    }
+// Check token exists
+if (process.env.TOKEN_SECRET == undefined ||  process.env.TOKEN_SECRET == null) {
+    console.log("TOKEN_SECRET not loaded!! please check this.");
+} else {
+    jwt.sign(user, process.env.TOKEN_SECRET, { expiresIn: '1800s' });
+}
 }
 
-const authenticateToken = (req: Request, res: Response, next: Function) => {
+const authenticateToken = (req: Request<{user: string}>, res: Response, next: Function) => {
     const authHeader = req.headers['Authorization'] as string | "Bearer x";
     console.log(authHeader);
     const token: string = authHeader && (<string>authHeader).split(' ')[1];
@@ -60,7 +60,7 @@ const authenticateToken = (req: Request, res: Response, next: Function) => {
         console.log(err);
         if(err) return res.sendStatus(403);
 
-        req.user = user;
+        req.params.user = user;
 
         next();
     });
