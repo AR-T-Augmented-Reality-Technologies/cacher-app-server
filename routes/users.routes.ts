@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import { getHashedPassword_async, checkPassword, generateAccessToken, authenticateToken } from "../middleware/users.middleware";
+import { getHashedPassword_async, checkPassword, generateAccessToken } from "../middleware/users.middleware";
 import { PrismaClient } from '@prisma/client'
 import { calculateUserAge } from "../helpers/users.helper";
 
@@ -14,7 +14,7 @@ usersRoutes.post('/create', async (req: Request, res: Response) => {
     // Create password hash.
     const hashedPassword = await getHashedPassword_async(password);
 
-    // Create 
+    // Create
     const newUser = await prisma.users.create({
         data: {
             user_firstname: firstname,
@@ -61,8 +61,6 @@ usersRoutes.get('/:id',  async (req: Request, res: Response) => {
         }
     });
 
-    console.log({status: true, user: user, age: age, roles: roles});
-
     res.json({status: true, user: user, age: age, roles: roles});
 });
 
@@ -70,42 +68,47 @@ usersRoutes.post('/login', async (req: Request, res: Response) => {
     const { email, password_unhashed } = req.body;
 
     // Get the password hash from database
-    prisma.users.findFirst({
+    const user = await prisma.users.findFirst({
         where: {
             user_email: email as string
         }
-    })
-    .then(async (user) => {
-        console.log("Got user: " + user);
-
-        // Check passwords using salt
-        const check = await checkPassword(password_unhashed, user.user_password);
-
-        if (!check) {
-            res.sendStatus(403);
-        }
-
-        // Create access token
-        const accessToken = generateAccessToken({ email: email });
-
-        res.json({status: check, data: { success: check, user: user, token: accessToken || ""}});
     });
+
+    // Check that the user has been found
+    if (user == undefined || user == null) {
+        res.json({ status:false, data: { message: "FAILED TO FIND USER"}});
+        return;
+    }
+
+    // Check passwords using salt
+    const check = await checkPassword(password_unhashed, user.user_password);
+
+    // Check that the passwords matched
+    if (!check) {
+        res.json({ status:false, data: { message: "PASSWORD WAS INCORRECT"}});
+        return;
+    }
+
+    // Create access token
+    const accessToken = generateAccessToken({ email: email });
+
+    res.json({status: check, data: { success: check, user: user, token: accessToken }});
 });
 
-usersRoutes.delete('/:id', async (req: Request, res: Response)  => {
+usersRoutes.delete('/:id', async (req: Request<{id: number}>, res: Response)  => {
     const { id } = req.params;
 
     // Delete related records first
-    const delted_age = await prisma.ages.delete({
-        where: {
-            user_id: parseInt(id)
-        }
-    });
+    //const deleted_age = await prisma.ages.delete({
+    //    where: {
+    //        user_id: (<number> id)
+    //    }
+    //});
 
     // Delete user from database
     const deleted_record = await prisma.users.delete({
         where: {
-            user_id: parseInt(id)
+            user_id: id as number
         }
     });
 

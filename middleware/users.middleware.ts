@@ -2,6 +2,8 @@
 import bcrypt from 'bcrypt';
 import jwt from "jsonwebtoken";
 import { Request, Response } from "express";
+import { request } from 'http';
+import { stringify } from 'querystring';
 
 const getHashedPassword = (unhashed_password: string) => {
     const hashed_password = bcrypt.genSalt(10, (err, salt) => {
@@ -19,7 +21,7 @@ const getHashedPassword = (unhashed_password: string) => {
             console.log(encrypted);
             return encrypted;
         });
-    }); 
+    });
 
     return hashed_password;
 };
@@ -38,13 +40,18 @@ const checkPassword = async (unhashed_password: string, hashed_password: string)
 };
 
 const generateAccessToken = (user: any) => {
-    return jwt.sign(user, process.env.TOKEN_SECRET, { expiresIn: '1800s' });
+    // Check token exists
+    if (process.env.TOKEN_SECRET == undefined ||  process.env.TOKEN_SECRET == null) {
+        console.log("TOKEN_SECRET not loaded!! please check this.");
+    } else {
+        jwt.sign(user, process.env.TOKEN_SECRET, { expiresIn: '1800s' });
+    }
 }
 
-const authenticateToken = (req: Request, res: Response, next) => {
-    const authHeader: string = req.headers['Authorization'];
+const authenticateToken = (req: Request, res: Response, next: Function) => {
+    const authHeader = req.headers['Authorization'] as string | "Bearer x";
     console.log(authHeader);
-    const token: string = authHeader && authHeader.split(' ')[1];
+    const token: string = authHeader && (<string>authHeader).split(' ')[1];
     console.log(token);
 
     if(token == null) return res.sendStatus(401);
@@ -58,12 +65,12 @@ const authenticateToken = (req: Request, res: Response, next) => {
         next();
     });
  };
-  
 
-export { 
-    getHashedPassword, 
-    getHashedPassword_async, 
-    checkPassword, 
+
+export {
+    getHashedPassword,
+    getHashedPassword_async,
+    checkPassword,
     generateAccessToken,
     authenticateToken
 };
