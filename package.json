@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.ts",
   "type": "module",
+  "module": "commonjs",
   "scripts": {
     "build": "npx tsc",
     "start": "node dist/index.js --jsx",
