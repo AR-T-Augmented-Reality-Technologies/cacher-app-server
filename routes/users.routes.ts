@@ -74,9 +74,6 @@ usersRoutes.post('/login', async (req: Request, res: Response) => {
         }
     });
 
-    console.log(user);
-    res.json({ status: false, user: user });
-
     // Check that the user has been found
     if (user == undefined || user == null) {
         res.json({ status:false, data: { message: "FAILED TO FIND USER"}});
