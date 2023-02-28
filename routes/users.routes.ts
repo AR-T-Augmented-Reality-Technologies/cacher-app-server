@@ -93,6 +93,7 @@ usersRoutes.post('/login', async (req: Request, res: Response) => {
     const accessToken = generateAccessToken({ email: email });
 
     res.json({status: check, data: { success: check, user: user, token: accessToken }});
+    return;
 });
 
 usersRoutes.delete('/:id', async (req: Request<{id: number}>, res: Response)  => {

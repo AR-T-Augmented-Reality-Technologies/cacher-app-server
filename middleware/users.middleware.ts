@@ -2,8 +2,6 @@
 import bcrypt from 'bcrypt';
 import jwt from "jsonwebtoken";
 import { Request, Response } from "express";
-import { request } from 'http';
-import { stringify } from 'querystring';
 
 const getHashedPassword = (unhashed_password: string) => {
     const hashed_password = bcrypt.genSalt(10, (err, salt) => {
@@ -18,34 +16,34 @@ const getHashedPassword = (unhashed_password: string) => {
                 return "";
             }
 
-        console.log(encrypted);
-        return encrypted;
+            console.log(encrypted);
+            return encrypted;
+        });
     });
-});
 
-return hashed_password;
+    return hashed_password;
 };
 
 const getHashedPassword_async = async function (unhashed_password: string) {
-// Generate salt
-const salt = await bcrypt.genSalt(10);
+    // Generate salt
+    const salt = await bcrypt.genSalt(10);
 
-const hashed_password = await bcrypt.hash(unhashed_password, salt);
+    const hashed_password = await bcrypt.hash(unhashed_password, salt);
 
-return hashed_password;
+    return hashed_password;
 };
 
 const checkPassword = async (unhashed_password: string, hashed_password: string) => {
-return await bcrypt.compare(unhashed_password, hashed_password);
+    return await bcrypt.compare(unhashed_password, hashed_password);
 };
 
 const generateAccessToken = (user: any) => {
-// Check token exists
-if (process.env.TOKEN_SECRET == undefined ||  process.env.TOKEN_SECRET == null) {
-    console.log("TOKEN_SECRET not loaded!! please check this.");
-} else {
-    jwt.sign(user, process.env.TOKEN_SECRET, { expiresIn: '1800s' });
-}
+    // Check token exists
+    if (process.env.TOKEN_SECRET == undefined || process.env.TOKEN_SECRET == null) {
+        console.log("TOKEN_SECRET not loaded!! please check this.");
+    } else {
+        jwt.sign(user, process.env.TOKEN_SECRET, { expiresIn: '86400s' });
+    }
 }
 
 const authenticateToken = (req: Request<{user: string}>, res: Response, next: Function) => {
