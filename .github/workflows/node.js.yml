@@ -22,6 +22,8 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
+    - run: touch .env
+    - run: echo DATABASE_URL=${{secrets.DATABASE_URL}} >> .env
     - run: npm i
     - run: npm run build
     - run: pm2 stop 0 
