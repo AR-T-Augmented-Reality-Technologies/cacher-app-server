@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import { getHashedPassword_async, checkPassword, generateAccessToken } from "../middleware/users.middleware";
+import { getHashedPassword_async, checkPassword, generateAccessToken, authenticateToken } from "../middleware/users.middleware";
 import { PrismaClient } from '@prisma/client'
 import { calculateUserAge } from "../helpers/users.helper";
 
@@ -37,7 +37,7 @@ usersRoutes.post('/create', async (req: Request, res: Response) => {
     res.json({ status: true, user: newUser, newAge: newAge });
 });
 
-usersRoutes.get('/:id',  async (req: Request, res: Response) => {
+usersRoutes.get('/:id', authenticateToken, async (req: Request, res: Response) => {
     const { id } = req.params;
 
     // Get the User
