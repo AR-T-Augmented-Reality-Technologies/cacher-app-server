@@ -24,6 +24,7 @@ jobs:
         cache: 'npm'
     - run: touch .env
     - run: echo DATABASE_URL=${{secrets.DATABASE_URL}} >> .env
+    - run: echo TOKEN_SECRET=${{secrets.TOKEN_SECRET}} >> .env
     - run: npm i
     - run: npm run build
     - run: pm2 stop 0 
