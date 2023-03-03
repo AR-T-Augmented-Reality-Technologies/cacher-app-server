@@ -116,7 +116,7 @@ usersRoutes.delete('/:id', async (req: Request<{id: number}>, res: Response)  =>
     res.json({status: true, data: { msg: "User sucessfully deleted!", deleted_user: deleted_record }});
 });
 
-usersRoutes.post('/:id/make_private', async (req: Request, res: Response) => {
+usersRoutes.get('/:id/make_private', async (req: Request, res: Response) => {
     const { id } = req.params;
 
     const private_user = prisma.private_user.create({
