@@ -15,16 +15,19 @@ model scrapbook {
 }
 
 model users {
-  user_id        Int           @id @unique @default(autoincrement())
-  user_firstname String        @db.VarChar(255)
-  user_lastname  String        @db.VarChar(255)
-  user_email     String        @db.VarChar(255)
-  user_password  String        @db.VarChar(255)
-  user_username  String        @default("guest") @db.VarChar(255)
+  user_id        Int            @id @unique @default(autoincrement())
+  user_firstname String         @db.VarChar(255)
+  user_lastname  String         @db.VarChar(255)
+  user_email     String         @db.VarChar(255)
+  user_password  String         @db.VarChar(255)
+  user_username  String         @default("guest") @db.VarChar(255)
   ages           ages[]
   managed_by     managed_by[]
   roles          roles[]
   uploaded_by    uploaded_by[]
+  private_user   private_user[]
+  following      following[]
+  blocked        blocked[]
 }
 
 model ages {
@@ -41,7 +44,6 @@ model image {
   photo_id     String        @id @db.VarChar(255)
   image        String        @db.VarChar(255)
   likes        Int
-  comments     String        @db.VarChar(255)
   num_comments Int
   caption      String        @db.VarChar(255)
   upload_date  DateTime      @db.Date
@@ -113,3 +115,30 @@ model uploaded_by {
   @@index([photo_id], map: "photo_id")
   @@index([user_id], map: "user_id")
 }
+
+model private_user {
+  id      Int   @id @default(autoincrement())
+  user_id Int
+  users   users @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "private_user_ibfk_1")
+
+  @@index([user_id], map: "user_id")
+}
+
+model following {
+  id        Int   @id @default(autoincrement())
+  user_id_1 Int
+  user_id_2 Int
+  users     users @relation(fields: [user_id_1], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "following_ibfk_1")
+
+  @@index([user_id_1], map: "user_id")
+}
+
+model blocked {
+  id        Int   @id @default(autoincrement())
+  user_id_1 Int
+  user_id_2 Int
+  users     users @relation(fields: [user_id_1], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "blocked_ibfk_1")
+
+  @@index([user_id_1], map: "user_id")
+}
+
