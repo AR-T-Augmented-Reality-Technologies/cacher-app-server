@@ -17,16 +17,16 @@ app.use(bodyParser.urlencoded({ extended: false }));
 const allowlist = ['http://localhost:3000', 'localhost', 'http://127.0.0.1:3000'];
 
 const corsOptionsDelegate = (req: Request, callback: any) => {
-  let corsOptions;
+    let corsOptions;
     const request_origin: string = req.header('Origin') as string | "http://localhost:3000/";
 
-  if (-1 !== allowlist.indexOf(request_origin)) {
-    corsOptions = { origin: true }
-  } else {
-    corsOptions = { origin: false }
-  }
+    if (-1 !== allowlist.indexOf(request_origin)) {
+        corsOptions = { origin: true }
+    } else {
+        corsOptions = { origin: false }
+    }
 
-  callback(null, corsOptions);
+    callback(null, corsOptions);
 }
 
 // Add API router
@@ -40,6 +40,5 @@ app.get('/', cors(corsOptionsDelegate), (req: Request, res: Response) => {
 const port = process.env.PORT || 4000;
 
 app.listen(port, () => {
-console.log(`Example app listening on port ${port}`)
-}
-);
+    console.log(`Example app listening on port ${port}`)
+});
