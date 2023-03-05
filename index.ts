@@ -37,6 +37,12 @@ app.get('/', cors(corsOptionsDelegate), (req: Request, res: Response) => {
     res.send('<h1>Index from server</h1>');
 });
 
+app.use((req, res, next) => {
+    res.status(404).json({
+        message: 'Ohh you are lost, read the API documentation to find your way back home :)'
+    })
+});
+
 const port = process.env.PORT || 4000;
 
 app.listen(port, () => {

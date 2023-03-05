@@ -22,12 +22,12 @@ model users {
   user_password  String         @db.VarChar(255)
   user_username  String         @default("guest") @db.VarChar(255)
   ages           ages[]
+  blocked        blocked[]
+  following      following[]
   managed_by     managed_by[]
+  private_user   private_user[]
   roles          roles[]
   uploaded_by    uploaded_by[]
-  private_user   private_user[]
-  following      following[]
-  blocked        blocked[]
 }
 
 model ages {
@@ -55,7 +55,7 @@ model managed_by {
   scrapbook_id String    @unique(map: "scrapbook_id") @db.VarChar(255)
   user_id      Int
   scrapbook    scrapbook @relation(fields: [scrapbook_id], references: [scrapbook_id], onDelete: NoAction, onUpdate: NoAction, map: "managed_by_ibfk_1")
-  users        users     @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "managed_by_ibfk_2")
+  users        users     @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "managed_by_ibfk_2")
 
   @@index([user_id], map: "user_id")
 }
@@ -84,8 +84,8 @@ model pages {
   page_collection String    @id @db.VarChar(255)
   scrapbook_id    String    @db.VarChar(255)
   number_of_pages Int
-  page            page[]
   scrapbook       scrapbook @relation(fields: [scrapbook_id], references: [scrapbook_id], onDelete: NoAction, onUpdate: NoAction, map: "pages_ibfk_1")
+  page            page[]
 
   @@index([scrapbook_id], map: "scrapbook_id")
 }
@@ -103,7 +103,6 @@ model roles {
   users             users  @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "roles_ibfk_1")
 
   @@index([user_id], map: "user_id")
-
 }
 
 model uploaded_by {
@@ -120,7 +119,7 @@ model uploaded_by {
 model private_user {
   id      Int   @id @default(autoincrement())
   user_id Int
-  users   users @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "private_user_ibfk_1")
+  users   users @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "private_user_ibfk_1")
 
   @@index([user_id], map: "user_id")
 }
@@ -129,7 +128,7 @@ model following {
   id        Int   @id @default(autoincrement())
   user_id_1 Int
   user_id_2 Int
-  users     users @relation(fields: [user_id_1], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "following_ibfk_1")
+  users     users @relation(fields: [user_id_1], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "following_ibfk_1")
 
   @@index([user_id_1], map: "user_id")
 }
@@ -138,8 +137,7 @@ model blocked {
   id        Int   @id @default(autoincrement())
   user_id_1 Int
   user_id_2 Int
-  users     users @relation(fields: [user_id_1], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "blocked_ibfk_1")
+  users     users @relation(fields: [user_id_1], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "blocked_ibfk_1")
 
   @@index([user_id_1], map: "user_id")
 }
-
