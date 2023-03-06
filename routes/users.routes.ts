@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express";
 import { PrismaClient } from '@prisma/client'
-import { UserService } from "../services/user.service";
+import { UpdateUserType, UserService } from "../services/user.service";
 
 // Create our PRISMA Client
 const prisma = new PrismaClient()
@@ -36,6 +36,19 @@ usersRoutes.get('/:id', async (req: Request, res: Response) => {
     res.json(query_response);
 });
 
+// Update user data
+
+usersRoutes.post('/:id/updateProfileData', async (req: Request, res: Response) => {
+    const id = parseInt(req.params.id);
+
+    const updateData: UpdateUserType = req.body;
+    console.log(updateData);
+
+    const query_response = await userService.UpdateUser(id, updateData);
+
+    res.json(query_response);
+});
+
 // Delete user
 usersRoutes.delete('/:id', async (req: Request, res: Response)  => {
     const id = parseInt(req.params.id);
@@ -51,7 +64,7 @@ usersRoutes.put('/:id/togglePrivateUser', async (req: Request, res: Response) =>
 
     const query_response = await userService.TogglePrivateUser(id);
 
-    res.json({ status: true, data: query_response });
+    res.json(query_response);
 });
 
 // Login user

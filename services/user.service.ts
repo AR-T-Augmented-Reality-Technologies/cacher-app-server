@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import { getHashedPassword_async, checkPassword, generateAccessToken }  from "../middleware/users.middleware";
 import { calculateUserAge } from "../helpers/users.helper"
 ;
-interface CreateUserType {
+export interface CreateUserType {
     username: string,
     firstname: string,
     lastname: string,
@@ -11,11 +11,14 @@ interface CreateUserType {
     dob: string
 };
 
-interface UpdateUserType {
-    //TODO: add this
+export interface UpdateUserType {
+    user_firstname: string,
+    user_lastname: string,
+    user_email: string,
+    user_username: string
 };
 
-interface LoginUserType {
+export interface LoginUserType {
     email: string,
     unhashed_password: string
 }
@@ -78,8 +81,13 @@ export class UserService {
         return { status: true, data: { user: _user, age: _age, roles: _roles }};
     };
 
-    async UpdateUser(_user_data: UpdateUserType) {
-        throw Error("not implemented yet");
+    async UpdateUser(_user_id: number, _user_data: UpdateUserType) {
+        const _updatedUser = await this._prisma.users.update({
+            where: { user_id: _user_id },
+            data: _user_data
+        });
+
+        if (_updatedUser) return { status: true, data: _updatedUser };
     };
 
     async DeleteUser(id: number) {
@@ -121,10 +129,10 @@ export class UserService {
                 where: { id: _query_find_private_user.id }
             });
 
-            return { status: true, data: _delete_private_user_record };
+            return { status: false, data: _delete_private_user_record };
         }
 
-        return { status: false, data: {}};
+        return { status: false, data: { message: "[ERR] Failed to privitize user...?"}};
     };
 
     async Login(login_data: LoginUserType) {
