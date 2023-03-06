@@ -36,3 +36,5 @@ imagesRoutes.post('/addcomment',  async (req: Request, res: Response) => {
     console.log(`Comment Added!`);
     res.json({ status: true, data: { comments: comments }});
 });
+
+export default imagesRoutes;
