@@ -54,6 +54,12 @@ export class UserService {
             return { status: false, data: { message: "USERNAME ALREADY EXISTS" }};
         }
 
+        const _age = calculateUserAge(_user_data.dob);
+        
+        if (_age < 13) {
+            return { status: false, data: { message: "USER IS UNDER 13" }};
+        }
+
         // Create new user in database
         const _new_user = await this._prisma.users.create({
             data: {
