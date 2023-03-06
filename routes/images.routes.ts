@@ -23,14 +23,14 @@ imagesRoutes.get('/:id',  async (req: Request, res: Response) => {
 });
 
 imagesRoutes.post('/addcomment',  async (req: Request, res: Response) => {
-    const { imageid, userid, comment, time} = req.body;
+    const { imageid, userid, comment, timestamp } = req.body;
 
     const comments = prisma.comments.create({
         data: {
             user_id: userid,
             photo_id: imageid,
             comment: comment,
-            timestamp: time
+            timestamp: timestamp
         }
     });
     console.log(`Comment Added!`);
