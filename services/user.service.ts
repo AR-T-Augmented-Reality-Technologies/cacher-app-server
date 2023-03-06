@@ -37,7 +37,22 @@ export class UserService {
         // Create password hash for user
         const _hashed_password = await getHashedPassword_async(_user_data.password);
 
-        //TODO: Check user `email` or `username` isn't already taken.
+        // Check if email is already in the users table
+        const _emailTaken = await this._prisma.users.findFirst({
+            where: { user_email: _user_data.email }
+        });
+
+        if (_emailTaken) {
+            return { status: false, data: { message: "EMAIL ALREADY EXISTS" }};
+        }
+
+        const _usernameTaken = await this._prisma.users.findFirst({
+            where: { user_username: _user_data.username }
+        });
+
+        if (_usernameTaken) {
+            return { status: false, data: { message: "USERNAME ALREADY EXISTS" }};
+        }
 
         // Create new user in database
         const _new_user = await this._prisma.users.create({
