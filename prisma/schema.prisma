@@ -28,9 +28,6 @@ model users {
   private_user   private_user[]
   roles          roles[]
   uploaded_by    uploaded_by[]
-  private_user   private_user[]
-  following      following[]
-  blocked        blocked[]
   comments       comments[]
   reply_comments reply_comments[]
 }
