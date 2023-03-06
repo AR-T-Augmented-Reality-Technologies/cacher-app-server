@@ -15,12 +15,12 @@ model scrapbook {
 }
 
 model users {
-  user_id        Int            @id @unique @default(autoincrement())
-  user_firstname String         @db.VarChar(255)
-  user_lastname  String         @db.VarChar(255)
-  user_email     String         @db.VarChar(255)
-  user_password  String         @db.VarChar(255)
-  user_username  String         @default("guest") @db.VarChar(255)
+  user_id        Int              @id @unique @default(autoincrement())
+  user_firstname String           @db.VarChar(255)
+  user_lastname  String           @db.VarChar(255)
+  user_email     String           @db.VarChar(255)
+  user_password  String           @db.VarChar(255)
+  user_username  String           @default("guest") @db.VarChar(255)
   ages           ages[]
   blocked        blocked[]
   following      following[]
@@ -28,6 +28,11 @@ model users {
   private_user   private_user[]
   roles          roles[]
   uploaded_by    uploaded_by[]
+  private_user   private_user[]
+  following      following[]
+  blocked        blocked[]
+  comments       comments[]
+  reply_comments reply_comments[]
 }
 
 model ages {
@@ -48,6 +53,7 @@ model image {
   caption      String        @db.VarChar(255)
   upload_date  DateTime      @db.Date
   uploaded_by  uploaded_by[]
+  comments     comments[]
 }
 
 model managed_by {
@@ -140,4 +146,33 @@ model blocked {
   users     users @relation(fields: [user_id_1], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "blocked_ibfk_1")
 
   @@index([user_id_1], map: "user_id")
+}
+
+model comments {
+  comment_id Int      @id @default(autoincrement())
+  user_id    Int
+  photo_id   String   @db.VarChar(255)
+  comment    String   @db.VarChar(255)
+  timestamp  DateTime @db.Date
+
+  users          users            @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "comments_ibfk_1")
+  image          image            @relation(fields: [photo_id], references: [photo_id], onDelete: NoAction, onUpdate: NoAction, map: "comments_ibfk_2")
+  reply_comments reply_comments[]
+
+  @@index([user_id], map: "user_id")
+  @@index([photo_id], map: "photo_id")
+}
+
+model reply_comments {
+  replycomment_id Int      @id @default(autoincrement())
+  user_id         Int
+  comment_id      Int
+  comment         String   @db.VarChar(255)
+  timestamp       DateTime @db.Date
+
+  users    users    @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "reply_comments_ibfk_1")
+  comments comments @relation(fields: [comment_id], references: [comment_id], onDelete: NoAction, onUpdate: NoAction, map: "reply_comments_ibfk_2")
+
+  @@index([user_id], map: "user_id")
+  @@index([comment_id], map: "comment_id")
 }
