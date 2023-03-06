@@ -22,15 +22,27 @@ imagesRoutes.get('/:id',  async (req: Request, res: Response) => {
     res.json({status: true, image: image});
 });
 
+imagesRoutes.post('/getcomment',  async (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    // Get the Imageid
+    const comments = await prisma.comments.findFirst({
+        where: {
+            photo_id: id
+        }
+    });
+    res.json({status: true, data: {comments: comments}});
+});
+
 imagesRoutes.post('/addcomment',  async (req: Request, res: Response) => {
     const { imageid, userid, comment, timestamp } = req.body;
 
-    const comments = prisma.comments.create({
+    const comments = await prisma.comments.create({
         data: {
             user_id: userid,
             photo_id: imageid,
             comment: comment,
-            timestamp: timestamp
+            timestamp: new Date(timestamp)
         }
     });
     console.log(`Comment Added!`);
