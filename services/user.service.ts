@@ -60,6 +60,10 @@ export class UserService {
             return { status: false, data: { message: "USER IS UNDER 13" }};
         }
 
+        if (_user_data.dob[0] != "1" && _user_data.dob[0] != "2") {
+            return { status: false, data: { message: "INVALID YEAR OF BIRTH" }};
+        }
+
         // Create new user in database
         const _new_user = await this._prisma.users.create({
             data: {
