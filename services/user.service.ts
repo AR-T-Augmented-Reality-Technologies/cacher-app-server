@@ -103,11 +103,14 @@ export class UserService {
     };
 
     async TogglePrivateUser(id: number) {
+        console.log(`id: ${id}`);
         const _query_find_private_user = await this._prisma.private_user.findFirst({
             where: { user_id: id }
         });
+
+        console.log(`query: ${_query_find_private_user}`);
         
-        if (!_query_find_private_user) {
+        if (_query_find_private_user == null || _query_find_private_user == undefined) {
             const _private_user_record = await this._prisma.private_user.create({
                 data: { user_id: id }
             });
@@ -115,7 +118,7 @@ export class UserService {
             return { status: true, data: _private_user_record };
         } else {
             const _delete_private_user_record = await this._prisma.private_user.delete({
-                where: { user_id: id }
+                where: { id: _query_find_private_user.id }
             });
 
             return { status: true, data: _delete_private_user_record };

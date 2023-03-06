@@ -1,4 +1,4 @@
-import { Router, Request, Response, query } from "express";
+import { Router, Request, Response } from "express";
 import { PrismaClient } from '@prisma/client'
 import { UserService } from "../services/user.service";
 
@@ -46,7 +46,7 @@ usersRoutes.delete('/:id', async (req: Request, res: Response)  => {
 });
 
 // Make user private
-usersRoutes.get('/:id/make_private', async (req: Request, res: Response) => {
+usersRoutes.put('/:id/togglePrivateUser', async (req: Request, res: Response) => {
     const id = parseInt(req.params.id);
 
     const query_response = await userService.TogglePrivateUser(id);
