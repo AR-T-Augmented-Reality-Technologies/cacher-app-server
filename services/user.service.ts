@@ -142,7 +142,7 @@ export class UserService {
 
         // Check that the user exists
         if (user == undefined || user == null) {
-            return { status: false, data: { message: "FAILED TOP FIND USER" }};
+            return { status: false, data: { message: "FAILED TO FIND USER" }};
         }
 
         // Check the password using a salt
