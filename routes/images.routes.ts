@@ -9,7 +9,7 @@ const prisma = new PrismaClient()
 const imagesRoutes: Router = Router();
 
 imagesRoutes.get('/:id',  async (req: Request, res: Response) => {
-    const { id } = req.params;
+    const id = req.params.id;
 
     // Get the Imageid
     const image = await prisma.image.findFirst({
@@ -34,8 +34,8 @@ imagesRoutes.post('/getlikes',  async (req: Request, res: Response) => {
     res.json({status: true, data: {image: images}});
 });
 
-imagesRoutes.post('/getcomment',  async (req: Request, res: Response) => {
-    const { id } = req.params;
+imagesRoutes.post('/:id/getComments',  async (req: Request, res: Response) => {
+    const id = parseInt(req.params.id);
 
     // Get the Imageid
     const comments = await prisma.comments.findMany({

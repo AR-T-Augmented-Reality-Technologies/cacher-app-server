@@ -42,15 +42,15 @@ const generateAccessToken = (user: any) => {
     if (process.env.TOKEN_SECRET == undefined || process.env.TOKEN_SECRET == null) {
         console.log("TOKEN_SECRET not loaded!! please check this.");
     } else {
-        jwt.sign(user, process.env.TOKEN_SECRET, { expiresIn: '86400s' });
+        return jwt.sign(user, process.env.TOKEN_SECRET, { expiresIn: '86400s' });
     }
 }
 
-const authenticateToken = (req: Request<{user: string}>, res: Response, next: Function) => {
-    const authHeader = req.headers['Authorization'] as string | "Bearer x";
-    console.log(authHeader);
+const authenticateToken = (req: Request, res: Response, next: Function) => {
+    const authHeader = req.headers['authorization'];
+    console.log(`AuthHeader: ${authHeader}`);
     const token: string = authHeader && (<string>authHeader).split(' ')[1];
-    console.log(token);
+    console.log(`Token: ${token}`);
 
     if(token == null) return res.sendStatus(401);
 
