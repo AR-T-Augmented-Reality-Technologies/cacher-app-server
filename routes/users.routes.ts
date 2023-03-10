@@ -1,7 +1,7 @@
 import { Router, Request, Response } from "express";
 import { PrismaClient } from '@prisma/client'
 import { UpdateUserType, UserService } from "../services/user.service";
-/*import { authenticateToken } from "../middleware/users.middleware";*/
+import { authenticateToken } from "../middleware/users.middleware";
 
 // Create our PRISMA Client
 const prisma = new PrismaClient()
@@ -29,7 +29,7 @@ usersRoutes.post('/create', async (req: Request, res: Response) => {
 });
 
 // Get user by `user_id`
-usersRoutes.get('/:id',/* authenticateToken,*/ async (req: Request, res: Response) => {
+usersRoutes.get('/:id', authenticateToken, async (req: Request, res: Response) => {
     const id = parseInt(req.params.id);
 
     const query_response = await userService.ReadUser(id);
@@ -39,7 +39,7 @@ usersRoutes.get('/:id',/* authenticateToken,*/ async (req: Request, res: Respons
 
 // Update user data
 
-usersRoutes.post('/:id/updateProfileData',/* authenticateToken,*/  async (req: Request, res: Response) => {
+usersRoutes.post('/:id/updateProfileData', authenticateToken, async (req: Request, res: Response) => {
     const id = parseInt(req.params.id);
 
     const updateData: UpdateUserType = req.body;
@@ -51,7 +51,7 @@ usersRoutes.post('/:id/updateProfileData',/* authenticateToken,*/  async (req: R
 });
 
 // Delete user
-usersRoutes.delete('/:id',/* authenticateToken,*/  async (req: Request, res: Response)  => {
+usersRoutes.delete('/:id', authenticateToken, async (req: Request, res: Response)  => {
     const id = parseInt(req.params.id);
 
     const query_response = userService.DeleteUser(id);
@@ -60,7 +60,7 @@ usersRoutes.delete('/:id',/* authenticateToken,*/  async (req: Request, res: Res
 });
 
 // Make user private
-usersRoutes.put('/:id/togglePrivateUser',/* authenticateToken,*/  async (req: Request, res: Response) => {
+usersRoutes.put('/:id/togglePrivateUser', authenticateToken, async (req: Request, res: Response) => {
     const id = parseInt(req.params.id);
 
     const query_response = await userService.TogglePrivateUser(id);
