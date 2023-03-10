@@ -35,7 +35,7 @@ imagesRoutes.post('/getlikes',  async (req: Request, res: Response) => {
 });
 
 imagesRoutes.post('/:id/getComments',  async (req: Request, res: Response) => {
-    const id = parseInt(req.params.id);
+    const id = req.params.id;
 
     // Get the Imageid
     const comments = await prisma.comments.findMany({
