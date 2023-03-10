@@ -22,11 +22,23 @@ imagesRoutes.get('/:id',  async (req: Request, res: Response) => {
     res.json({status: true, image: image});
 });
 
+imagesRoutes.post('/getlikes',  async (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    // Get the Imageid
+    const images = await prisma.image.findFirst({
+        where: {
+            photo_id: id
+        }
+    });
+    res.json({status: true, data: {image: images}});
+});
+
 imagesRoutes.post('/getcomment',  async (req: Request, res: Response) => {
     const { id } = req.params;
 
     // Get the Imageid
-    const comments = await prisma.comments.findFirst({
+    const comments = await prisma.comments.findMany({
         where: {
             photo_id: id
         }
@@ -47,6 +59,40 @@ imagesRoutes.post('/addcomment',  async (req: Request, res: Response) => {
     });
     console.log(`Comment Added!`);
     res.json({ status: true, data: { comments: comments }});
+});
+
+imagesRoutes.post(':id/like',  async (req: Request, res: Response) => {
+    // const { imageid, likenum} = req.body;
+    const id = req.params.id;
+
+    const likeout = await prisma.image.update({
+        where: {
+            photo_id: id,
+        },
+        data: {  
+                likes: {
+                    increment: 1
+                }      
+        }
+    });
+    res.json({ status: true, data: { likeout: likeout }});
+});
+
+imagesRoutes.post(':id/dislike',  async (req: Request, res: Response) => {
+    // const { imageid, likenum} = req.body;
+    const id = req.params.id;
+
+    const likeout = await prisma.image.update({
+        where: {
+            photo_id: id,
+        },
+        data: {  
+                likes: {
+                    decrement: 1
+                }      
+        }
+    });
+    res.json({ status: true, data: { likeout: likeout }});
 });
 
 export default imagesRoutes;

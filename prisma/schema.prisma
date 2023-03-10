@@ -151,7 +151,6 @@ model comments {
   photo_id   String   @db.VarChar(255)
   comment    String   @db.VarChar(255)
   timestamp  DateTime @db.Date
-
   users          users            @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "comments_ibfk_1")
   image          image            @relation(fields: [photo_id], references: [photo_id], onDelete: NoAction, onUpdate: NoAction, map: "comments_ibfk_2")
   reply_comments reply_comments[]
