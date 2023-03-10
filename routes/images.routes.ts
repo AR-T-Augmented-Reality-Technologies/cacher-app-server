@@ -9,7 +9,7 @@ const prisma = new PrismaClient()
 const imagesRoutes: Router = Router();
 
 imagesRoutes.get('/:id',  async (req: Request, res: Response) => {
-    const { id } = req.params;
+    const id = parseInt(req.params.id);
 
     // Get the Imageid
     const image = await prisma.image.findFirst({
