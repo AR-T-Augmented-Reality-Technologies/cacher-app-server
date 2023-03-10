@@ -22,8 +22,8 @@ imagesRoutes.get('/:id',  async (req: Request, res: Response) => {
     res.json({status: true, image: image});
 });
 
-imagesRoutes.post('/getcomment',  async (req: Request, res: Response) => {
-    const { id } = req.params;
+imagesRoutes.post('/:id/getComments',  async (req: Request, res: Response) => {
+    const id = parseInt(req.params.id);
 
     // Get the Imageid
     const comments = await prisma.comments.findFirst({
