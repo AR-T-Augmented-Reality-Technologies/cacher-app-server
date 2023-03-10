@@ -42,7 +42,7 @@ const generateAccessToken = (user: any) => {
     if (process.env.TOKEN_SECRET == undefined || process.env.TOKEN_SECRET == null) {
         console.log("TOKEN_SECRET not loaded!! please check this.");
     } else {
-        jwt.sign(user, process.env.TOKEN_SECRET, { expiresIn: '86400s' });
+        return jwt.sign(user, process.env.TOKEN_SECRET, { expiresIn: '86400s' });
     }
 }
 
