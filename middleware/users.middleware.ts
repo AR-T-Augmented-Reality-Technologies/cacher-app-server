@@ -48,12 +48,11 @@ const generateAccessToken = (user: any) => {
 
 const authenticateToken = (req: Request, res: Response, next: Function) => {
     const authHeader = req.headers['authorization'];
-    if (authHeader == undefined || authHeader == null) return res.sendStatus(401);
-
+    console.log(`AuthHeader: ${authHeader}`);
     const token: string = authHeader && (<string>authHeader).split(' ')[1];
     console.log(`Token: ${token}`);
 
-    if(token == null || token == undefined) return res.sendStatus(401);
+    if(token == null) return res.sendStatus(401);
 
     jwt.verify(token, process.env.TOKEN_SECRET as string, (err: any, user: any) => {
         console.log(err);
