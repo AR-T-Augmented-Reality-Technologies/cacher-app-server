@@ -30,6 +30,7 @@ model users {
   uploaded_by    uploaded_by[]
   comments       comments[]
   reply_comments reply_comments[]
+  reported_posts reported_posts[]
 }
 
 model ages {
@@ -64,17 +65,18 @@ model managed_by {
 }
 
 model page {
-  page_id         String         @id @db.VarChar(255)
-  page_collection String         @db.VarChar(255)
-  pages           pages          @relation(fields: [page_collection], references: [page_collection], onDelete: NoAction, onUpdate: NoAction, map: "page_ibfk_1")
+  page_id         Int              @id @default(autoincrement())
+  page_collection String           @db.VarChar(255)
+  pages           pages            @relation(fields: [page_collection], references: [page_collection], onDelete: NoAction, onUpdate: NoAction, map: "page_ibfk_1")
   page_options    page_options[]
+  reported_posts  reported_posts[]
 
   @@index([page_collection], map: "page_collection")
 }
 
 model page_options {
   id               Int    @id @default(autoincrement())
-  page_id          String @db.VarChar(255)
+  page_id          Int
   page_title       String @db.VarChar(255)
   background_color String @db.VarChar(7)
   orientation      String @db.VarChar(255)
@@ -146,11 +148,11 @@ model blocked {
 }
 
 model comments {
-  comment_id Int      @id @default(autoincrement())
-  user_id    Int
-  photo_id   String   @db.VarChar(255)
-  comment    String   @db.VarChar(255)
-  timestamp  DateTime @db.Date
+  comment_id     Int              @id @default(autoincrement())
+  user_id        Int
+  photo_id       String           @db.VarChar(255)
+  comment        String           @db.VarChar(255)
+  timestamp      DateTime         @db.Date
   users          users            @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "comments_ibfk_1")
   image          image            @relation(fields: [photo_id], references: [photo_id], onDelete: NoAction, onUpdate: NoAction, map: "comments_ibfk_2")
   reply_comments reply_comments[]
@@ -171,4 +173,14 @@ model reply_comments {
 
   @@index([user_id], map: "user_id")
   @@index([comment_id], map: "comment_id")
+}
+
+model reported_posts {
+  reportid       Int     @id @default(autoincrement())
+  reporter_id    Int
+  page_id        Int
+  issue_resolved Boolean
+  reason         String  @db.VarChar(255)
+  users          users   @relation(fields: [reporter_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "reported_posts_ibfk_1")
+  page           page    @relation(fields: [page_id], references: [page_id], onDelete: NoAction, onUpdate: NoAction, map: "reported_posts_ibfk_2")
 }
