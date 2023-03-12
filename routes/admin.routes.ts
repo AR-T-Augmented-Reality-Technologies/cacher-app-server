@@ -9,9 +9,28 @@ const prisma = new PrismaClient()
 const adminRoutes: Router = Router();
 
 adminRoutes.post('/getReports',  async (req: Request, res: Response) => {
-    const reports = await prisma.reported_posts.findMany();
-    console.log('We made it to the rouite');
+    const reports = await prisma.reported_posts.findMany({
+        where: {
+            NOT: {
+                issue_resolved: true
+            },
+        }
+    });
     res.json({ status: true, data: { reported_posts: reports }});
+});
+
+adminRoutes.post('/resolve',  async (req: Request) => {
+    const id  = parseInt(req.body.repid);
+    const updatereport = await prisma.reported_posts.update({
+        where: {
+            reportid: id
+        },
+        data: {
+            issue_resolved:{
+                set: true
+            },
+        },
+    })
 });
 
 export default adminRoutes;
