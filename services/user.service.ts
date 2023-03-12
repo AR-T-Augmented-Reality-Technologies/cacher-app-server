@@ -15,7 +15,10 @@ export interface UpdateUserType {
     user_firstname: string,
     user_lastname: string,
     user_email: string,
-    user_username: string
+    user_username: string,
+    user_password: string,
+    user_password_confirm: string,
+    user_dob: string
 };
 
 export interface LoginUserType {
@@ -107,13 +110,73 @@ export class UserService {
     };
 
     async UpdateUser(_user_id: number, _user_data: UpdateUserType) {
-        const _updatedUser = await this._prisma.users.update({
-            where: { user_id: _user_id },
-            data: _user_data
+        const _currentUser = await this._prisma.users.findUnique({
+          where: { user_id: _user_id }
         });
-
-        if (_updatedUser) return { status: true, data: _updatedUser };
-    };
+      
+        if (!_currentUser) {
+          return { status: false, data: { message: "USER NOT FOUND" }};
+        }
+      
+        if (_user_data.user_email && _user_data.user_email !== _currentUser.user_email) {
+          const _emailTaken = await this._prisma.users.findFirst({
+            where: { user_email: _user_data.user_email }
+          });
+      
+          if (_emailTaken) {
+            return { status: false, data: { message: "EMAIL ALREADY EXISTS" }};
+          }
+        }
+      
+        if (_user_data.user_username && _user_data.user_username !== _currentUser.user_username) {
+          const _usernameTaken = await this._prisma.users.findFirst({
+            where: { user_username: _user_data.user_username }
+          });
+      
+          if (_usernameTaken) {
+            return { status: false, data: { message: "USERNAME ALREADY EXISTS" }};
+          }
+        }
+      
+        const data: any = {
+          user_firstname: _user_data.user_firstname ?? _currentUser.user_firstname,
+          user_lastname: _user_data.user_lastname ?? _currentUser.user_lastname,
+          user_email: _user_data.user_email ?? _currentUser.user_email,
+          user_username: _user_data.user_username ?? _currentUser.user_username
+        };
+      
+        if (_user_data.user_password && _user_data.user_password !== _currentUser.user_password && _user_data.user_password === _user_data.user_password_confirm) {
+            data.user_password = await getHashedPassword_async(_user_data.user_password);
+          } else if (_user_data.user_password && _user_data.user_password !== _currentUser.user_password) {
+            return { status: false, data: { message: "Passwords don't match" }};
+          }
+          
+      
+        const _updatedUser = await this._prisma.users.update({
+          where: { user_id: _user_id },
+          data
+        });
+      
+        if (_updatedUser) {
+          const _updatedAge = await this._prisma.ages.update({
+            where: { id: _user_id },
+            data: {
+                dob: new Date(_user_data.user_dob),
+                age: calculateUserAge(_user_data.user_dob)
+            }
+          });
+      
+          return { status: true, data: _updatedUser };
+        }
+      
+        return { status: false, data: { message: "USER UPDATE FAILED" }};
+      }
+      
+      // TODO:
+      // verify age over 13 and date format is correct.
+      // Add tooltips
+      // Some workaround for the password field?
+    
 
     async DeleteUser(id: number) {
         // Delete the user from the database
