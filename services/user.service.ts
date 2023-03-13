@@ -117,6 +117,8 @@ export class UserService {
         if (!_currentUser) {
           return { status: false, data: { message: "USER NOT FOUND" }};
         }
+
+        const regex_email = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
       
         if (_user_data.user_email && _user_data.user_email !== _currentUser.user_email) {
           const _emailTaken = await this._prisma.users.findFirst({
@@ -126,6 +128,26 @@ export class UserService {
           if (_emailTaken) {
             return { status: false, data: { message: "EMAIL ALREADY EXISTS" }};
           }
+        }
+        
+        if (_user_data.user_email && !regex_email.test(_user_data.user_email)) {
+            return { status: false, data: { message: "INVALID EMAIL FORMAT" }};
+        }
+
+        if (_user_data.user_dob == null) {
+            return { status: false, data: { message: "DATE OF BIRTH CANNOT BE EMPTY" }};
+        }
+
+        if (_user_data.user_email === "") {
+            return { status: false, data: { message: "EMAIL CANNOT BE EMPTY" }};
+        }
+
+        if (_user_data.user_firstname === "") {
+            return { status: false, data: { message: "FIRST NAME CANNOT BE EMPTY" }};
+        }
+
+        if (_user_data.user_lastname === "") {
+            return { status: false, data: { message: "LAST NAME CANNOT BE EMPTY" }};
         }
       
         if (_user_data.user_username && _user_data.user_username !== _currentUser.user_username) {
@@ -137,6 +159,18 @@ export class UserService {
             return { status: false, data: { message: "USERNAME ALREADY EXISTS" }};
           }
         }
+
+        if (_user_data.user_username === "") {
+            return { status: false, data: { message: "USERNAME CANNOT BE EMPTY" }};
+        }
+
+        if (calculateUserAge(_user_data.user_dob) < 13) {
+            return { status: false, data: { message: "USER IS UNDER 13" }};
+        }
+
+        if (_user_data.user_dob[0] != "1" && _user_data.user_dob[0] != "2") {
+            return { status: false, data: { message: "INVALID YEAR OF BIRTH" }};
+        }
       
         const data: any = {
           user_firstname: _user_data.user_firstname ?? _currentUser.user_firstname,
@@ -144,14 +178,17 @@ export class UserService {
           user_email: _user_data.user_email ?? _currentUser.user_email,
           user_username: _user_data.user_username ?? _currentUser.user_username
         };
-      
-        if (_user_data.user_password && _user_data.user_password !== _currentUser.user_password && _user_data.user_password === _user_data.user_password_confirm) {
+          
+          if (!_user_data.user_password) {
+            // Password field is empty, skip all checks
+          } else if (_user_data.user_password !== _currentUser.user_password && _user_data.user_password === _user_data.user_password_confirm) {
             data.user_password = await getHashedPassword_async(_user_data.user_password);
-          } else if (_user_data.user_password && _user_data.user_password !== _currentUser.user_password) {
-            return { status: false, data: { message: "Passwords don't match" }};
+          } 
+          else if (_user_data.user_password !== _currentUser.user_password) {
+            // Passwords don't match and confirmation doesn't match, return error
+            return { status: false, data: { message: "PASSWORDS DONT MATCH" }};
           }
           
-      
         const _updatedUser = await this._prisma.users.update({
           where: { user_id: _user_id },
           data
@@ -171,13 +208,6 @@ export class UserService {
       
         return { status: false, data: { message: "USER UPDATE FAILED" }};
       }
-      
-      // TODO:
-      // verify age over 13 and date format is correct.
-      // Add tooltips
-      // Some workaround for the password field?
-    
-
     async DeleteUser(id: number) {
         // Delete the user from the database
         const _deleted_user = await this._prisma.users.delete({
