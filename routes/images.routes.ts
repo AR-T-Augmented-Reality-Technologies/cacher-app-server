@@ -34,7 +34,7 @@ imagesRoutes.post('/getlikes',  async (req: Request, res: Response) => {
     res.json({status: true, data: {image: images}});
 });
 
-imagesRoutes.post('/:id/getComments',  async (req: Request, res: Response) => {
+imagesRoutes.post('/getcomment',  async (req: Request, res: Response) => {
     const id = req.params.id;
 
     // Get the Imageid
@@ -43,6 +43,7 @@ imagesRoutes.post('/:id/getComments',  async (req: Request, res: Response) => {
             photo_id: id
         }
     });
+    console.log('Getting comments')
     res.json({status: true, data: {comments: comments}});
 });
 
