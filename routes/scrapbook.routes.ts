@@ -14,4 +14,14 @@ scrapRoutes.post('/getBooks',  async (req: Request, res: Response) => {
     res.json({ status: true, data: { books: scraps }});
 });
 
+scrapRoutes.post('/setBooks',  async (req: Request, res: Response) => {
+    const { loc } = req.body;
+
+    const books = await prisma.scrapbook.create({
+        data: {
+            location: loc,
+        }
+    });
+});
+
 export default scrapRoutes;
