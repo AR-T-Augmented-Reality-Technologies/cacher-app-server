@@ -8,7 +8,7 @@ datasource db {
 }
 
 model scrapbook {
-  scrapbook_id String      @id @unique(map: "scrapbook_id") @db.VarChar(255)
+  scrapbook_id Int         @id @unique(map: "scrapbook_id") @default(autoincrement())
   location     String      @db.VarChar(255)
   managed_by   managed_by?
   pages        pages[]
@@ -56,7 +56,7 @@ model image {
 
 model managed_by {
   id           Int       @id @default(autoincrement())
-  scrapbook_id String    @unique(map: "scrapbook_id") @db.VarChar(255)
+  scrapbook_id Int       @unique(map: "scrapbook_id")
   user_id      Int
   scrapbook    scrapbook @relation(fields: [scrapbook_id], references: [scrapbook_id], onDelete: NoAction, onUpdate: NoAction, map: "managed_by_ibfk_1")
   users        users     @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "managed_by_ibfk_2")
@@ -87,16 +87,17 @@ model page_options {
 
 model pages {
   page_collection String    @id @db.VarChar(255)
-  scrapbook_id    String    @db.VarChar(255)
+  scrapbook_id    Int
   number_of_pages Int
-  scrapbook       scrapbook @relation(fields: [scrapbook_id], references: [scrapbook_id], onDelete: NoAction, onUpdate: NoAction, map: "pages_ibfk_1")
   page            page[]
-
+  scrapbook       scrapbook @relation(fields: [scrapbook_id], references: [scrapbook_id], onDelete: NoAction, onUpdate: NoAction, map: "pages_ibfk_1")
   @@index([scrapbook_id], map: "scrapbook_id")
+
 }
 
 model preoccupied {
-  location String @id @db.VarChar(255)
+  location     String @id @db.VarChar(255)
+  closest_book String @db.VarChar(255)
 }
 
 model roles {

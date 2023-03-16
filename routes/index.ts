@@ -5,6 +5,7 @@ import mapRoutes from "./map.routes";
 import usersRoutes from "./users.routes";
 import imagesRoutes from "./images.routes";
 import adminRoutes from "./admin.routes";
+import scrapRoutes from "./scrapbook.routes";
 
 const apiRouter: Router = Router();
 
@@ -13,5 +14,6 @@ apiRouter.use('/map', mapRoutes);
 apiRouter.use('/users', usersRoutes);
 apiRouter.use('/images', imagesRoutes);
 apiRouter.use('/admin',adminRoutes);
+apiRouter.use('/scrap', scrapRoutes)
 
 export default apiRouter;
