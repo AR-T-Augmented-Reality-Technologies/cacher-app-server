@@ -24,4 +24,15 @@ scrapRoutes.post('/setBooks',  async (req: Request, res: Response) => {
     });
 });
 
+scrapRoutes.post('/setBlocked',  async (req: Request, res: Response) => {
+    const { loc, bestloc } = req.body;
+
+    const books = await prisma.preoccupied.create({
+        data: {
+            location: loc,
+            closest_book: bestloc
+        }
+    });
+});
+
 export default scrapRoutes;

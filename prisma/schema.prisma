@@ -86,17 +86,18 @@ model page_options {
 }
 
 model pages {
-  page_collection String @id @db.VarChar(255)
-  scrapbook_id    Int   
+  page_collection String    @id @db.VarChar(255)
+  scrapbook_id    Int
   number_of_pages Int
   page            page[]
+  scrapbook       scrapbook @relation(fields: [scrapbook_id], references: [scrapbook_id], onDelete: NoAction, onUpdate: NoAction, map: "pages_ibfk_1")
+  @@index([scrapbook_id], map: "scrapbook_id")
 
-  scrapbook             scrapbook? @relation(fields: [scrapbookScrapbook_id], references: [scrapbook_id])
-  scrapbookScrapbook_id Int?
 }
 
 model preoccupied {
-  location String @id @db.VarChar(255)
+  location     String @id @db.VarChar(255)
+  closest_book String @db.VarChar(255)
 }
 
 model roles {
