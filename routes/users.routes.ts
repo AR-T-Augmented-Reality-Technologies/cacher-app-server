@@ -28,7 +28,16 @@ usersRoutes.post('/create', async (req: Request, res: Response) => {
     res.json(query_response);
 });
 
-// Get user by `user_id`
+/**
+ * Get all users
+ * @param {Request} req
+ * @param {Response} res
+ * @returns {Promise<Response>}
+ * @route GET /users
+ * @access Public
+ * @description Get all users
+ * @example http://localhost:3000/users
+ **/
 usersRoutes.get('/:id', authenticateToken, async (req: Request, res: Response) => {
     const id = parseInt(req.params.id);
 
@@ -38,7 +47,17 @@ usersRoutes.get('/:id', authenticateToken, async (req: Request, res: Response) =
 });
 
 // Update user data
-
+/**
+ * Update user data
+ * @param {Request} req
+ * @param {Response} res
+ * @returns {Promise<Response>}
+ * @route PUT /users/:id/updateProfileData
+ * @access Private
+ * @description Update user data
+ * @example http://localhost:3000/users/1/updateProfileData
+ * @example http://localhost:3000/users/2/updateProfileData
+    **/
 usersRoutes.post('/:id/updateProfileData', authenticateToken, async (req: Request, res: Response) => {
     const id = parseInt(req.params.id);
 
@@ -50,7 +69,16 @@ usersRoutes.post('/:id/updateProfileData', authenticateToken, async (req: Reques
     res.json(query_response);
 });
 
-// Delete user
+/**
+ * Delete user
+ * @param {Request} req
+ * @param {Response} res
+ * @returns {Promise<Response>}
+ * @route DELETE /users/:id
+ * @access Private
+ * @description Delete user
+ * @example http://localhost:3000/users/1
+  **/
 usersRoutes.delete('/:id', authenticateToken, async (req: Request, res: Response)  => {
     const id = parseInt(req.params.id);
 
@@ -60,6 +88,16 @@ usersRoutes.delete('/:id', authenticateToken, async (req: Request, res: Response
 });
 
 // Make user private
+/**
+ * Make user private
+ * @param {Request} req
+ * @param {Response} res
+ * @returns {Promise<Response>}
+ * @route PUT /users/:id/togglePrivateUser
+ * @access Private
+ * @description Make user private
+ * @example http://localhost:3000/users/1/togglePrivateUser
+ **/
 usersRoutes.put('/:id/togglePrivateUser', authenticateToken, async (req: Request, res: Response) => {
     const id = parseInt(req.params.id);
 
@@ -68,7 +106,16 @@ usersRoutes.put('/:id/togglePrivateUser', authenticateToken, async (req: Request
     res.json(query_response);
 });
 
-// Login user
+/**
+ * Get all users
+ * @param {Request} req
+ * @param {Response} res
+ * @returns {Promise<Response>}
+ * @route GET /users
+ * @access Public
+ * @description Get all users
+ * @example http://localhost:3000/users
+ **/
 usersRoutes.post('/login', async (req: Request, res: Response) => {
     const { email, password_unhashed } = req.body;
 
