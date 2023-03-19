@@ -7,9 +7,10 @@ import imagesRoutes from "./images.routes";
 import adminRoutes from "./admin.routes";
 import scrapRoutes from "./scrapbook.routes";
 
+// Create a new router
 const apiRouter: Router = Router();
 
-// add the API routes
+// Use our other routes
 apiRouter.use('/map', mapRoutes);
 apiRouter.use('/users', usersRoutes);
 apiRouter.use('/images', imagesRoutes);

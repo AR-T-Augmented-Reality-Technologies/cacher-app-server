@@ -1,7 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { getHashedPassword_async, checkPassword, generateAccessToken }  from "../middleware/users.middleware";
-import { calculateUserAge } from "../helpers/users.helper"
-;
+import { calculateUserAge } from "../helpers/users.helper";
 export interface CreateUserType {
     username: string,
     firstname: string,
@@ -26,6 +25,18 @@ export interface LoginUserType {
     unhashed_password: string
 }
 
+/**
+ * @class UserService
+ * @description This class is used to handle all user related database queries.
+ * @param {PrismaClient} prisma - The prisma client object.
+ * @returns {UserService} - The UserService object.
+ * @example
+ * const userService = new UserService(prisma);
+ * @example
+ * const userService = new UserService(new PrismaClient());
+ * @example
+ * const userService = new UserService();
+ */
 export class UserService {
     private _prisma: PrismaClient;
 
@@ -33,11 +44,22 @@ export class UserService {
         this._prisma  = prisma;
     }
 
+    /**
+     * @method CreateUser
+     * @description This method is used to create a new user in the database.
+     * @param {CreateUserType} _user_data - The user data to create a new user.
+     * @returns {Promise<{ status: boolean, data: { message: string } }>} - The response object.
+     * @example
+     * const userService = new UserService(prisma);
+     * const response = await userService.CreateUser({
+     * 
+     * });
+     */
     async CreateUser(_user_data: CreateUserType) {
         // Connect to database
         // _prisma.$connect();
         
-        // Create password hash for user
+        // Hash the password
         const _hashed_password = await getHashedPassword_async(_user_data.password);
 
         // Check if email is already in the users table
@@ -63,7 +85,9 @@ export class UserService {
             return { status: false, data: { message: "USER IS UNDER 13" }};
         }
 
+        // Check if year of birth is valid
         if (_user_data.dob[0] != "1" && _user_data.dob[0] != "2") {
+            // Invalid year of birth
             return { status: false, data: { message: "INVALID YEAR OF BIRTH" }};
         }
 
