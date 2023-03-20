@@ -158,8 +158,14 @@ imagesRoutes.post('/upload', upload.single('image'), async (req: Request, res: R
 
     // Configure the upload details to send to S3
     const fileName = generateFileName();
+    const bucketName = process.env.LINODE_OBJECT_STORAGE_BUCKET_NAME;
+
+    if (!bucketName) {
+        throw new Error('LINODE_OBJECT_STORAGE_BUCKET_NAME environment variable not defined');
+    }
+
     const uploadParams = {
-        Bucket: process.env.LINODE_OBJECT_STORAGE_BUCKET_NAME,
+        Bucket: bucketName,
         Body: fileBuffer,
         Key: fileName,
         ACL: 'public-read',
