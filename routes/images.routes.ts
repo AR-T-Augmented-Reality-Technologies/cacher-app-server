@@ -20,22 +20,6 @@ const upload = multer({ storage: storage });
 // Generate a random file name
 const generateFileName = (bytes = 32) => crypto.randomBytes(bytes).toString('hex');
 
-try {
-    // Create our S3 Client
-    const s3Client = new S3({
-        region: process.env.LINODE_OBJECT_STORAGE_REGION,
-        endpoint: process.env.LINODE_OBJECT_STORAGE_ENDPOINT,
-        sslEnabled: true,
-        s3ForcePathStyle: false,
-        credentials: new Credentials({
-            accessKeyId: process.env.LINODE_OBJECT_STORAGE_ACCESS_KEY_ID || "",
-            secretAccessKey: process.env.LINODE_OBJECT_STORAGE_SECRET_ACCESS_KEY || "",
-        }),
-    });
-} catch (e) {
-    console.log(e)
-}
-
 // Create our PRISMA Client
 const prisma = new PrismaClient();
 
@@ -159,7 +143,7 @@ imagesRoutes.post('/:id/dislike',  async (req: Request, res: Response) => {
 });
 
 imagesRoutes.post('/upload', upload.single('image'), async (req: Request, res: Response) => {
-    const file: Express.Multer.File = req.file;
+    const file: Express.Multer.File | undefined = req.file;
 
     if (!file) {
         return res.status(400).json({ status: false, message: "No file uploaded" });
@@ -179,24 +163,40 @@ imagesRoutes.post('/upload', upload.single('image'), async (req: Request, res: R
         Body: fileBuffer,
         Key: fileName,
         ACL: 'public-read',
-        ContentType: file?.mimetype
+        ContentType: file.mimetype
     };
 
-    // Send the upload to S3
-    const response = await s3Client.upload(uploadParams).promise();
-    console.log(response);
-    console.log(response.Location);
+    try {
+        // Create our S3 Client
+        const s3Client = new S3({
+            region: process.env.LINODE_OBJECT_STORAGE_REGION,
+            endpoint: process.env.LINODE_OBJECT_STORAGE_ENDPOINT,
+            sslEnabled: true,
+            s3ForcePathStyle: false,
+            credentials: new Credentials({
+                accessKeyId: process.env.LINODE_OBJECT_STORAGE_ACCESS_KEY_ID || "",
+                secretAccessKey: process.env.LINODE_OBJECT_STORAGE_SECRET_ACCESS_KEY || "",
+            }),
+        });
 
-    // Save the image name to the database. Any other req.body data can be saved here too but we don't need any other image data.
-    // const post = await prisma.posts.create({
-    //     data: {
-    //         imageName
-    //     }
-    // })
+        // Send the upload to S3
+        const response = await s3Client.upload(uploadParams).promise();
+        console.log(response);
+        console.log(response.Location);
 
-    // res.send(post)
+        // Save the image name to the database. Any other req.body data can be saved here too but we don't need any other image data.
+        // const post = await prisma.posts.create({
+        //     data: {
+        //         imageName
+        //     }
+        // })
 
-    res.json({status: true, uploadURL: response.Location});
+        // res.send(post)
+
+        res.json({status: true, uploadURL: response.Location});
+    } catch (e) {
+        console.log(e)
+    }
 });
 
 export default imagesRoutes;
