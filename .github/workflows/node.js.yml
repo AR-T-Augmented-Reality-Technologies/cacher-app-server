@@ -25,6 +25,11 @@ jobs:
     - run: touch .env
     - run: echo DATABASE_URL=${{secrets.DATABASE_URL}} >> .env
     - run: echo TOKEN_SECRET=${{secrets.TOKEN_SECRET}} >> .env
+    - run: echo LINODE_OBJECT_STORAGE_BUCKET_NAME=${{secrets.LINODE_OBJECT_STORAGE_BUCKET_NAME}} >> .env
+    - run: echo LINODE_OBJECT_STORAGE_REGION=${{secrets.LINODE_OBJECT_STORAGE_REGION}} >> .env
+    - run: echo LINODE_OBJECT_STORAGE_ENDPOINT=${{secrets.LINODE_OBJECT_STORAGE_ENDPOINT}} >> .env
+    - run: echo LINODE_OBJECT_STORAGE_ACCESS_KEY_ID=${{secrets.LINODE_OBJECT_STORAGE_ACCESS_KEY_ID}} >> .env
+    - run: echo LINODE_OBJECT_STORAGE_SECRET_ACCESS_KEY=${{secrets.LINODE_OBJECT_STORAGE_SECRET_ACCESS_KEY}} >> .env
     - run: npm i
     - run: npm run build
     - run: pm2 stop 0 
