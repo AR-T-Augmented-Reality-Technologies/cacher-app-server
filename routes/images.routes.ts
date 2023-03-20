@@ -12,28 +12,43 @@ import dotenv from 'dotenv'
 
 dotenv.config()
 
-// Create uplod method
+// Create our Multer Storage
 const storage = multer.memoryStorage();
+// Create our Multer Upload
 const upload = multer({ storage: storage });
 
+// Generate a random file name
 const generateFileName = (bytes = 32) => crypto.randomBytes(bytes).toString('hex');
 
-const s3Client = new S3({
-    region: process.env.LINODE_OBJECT_STORAGE_REGION,
-    endpoint: process.env.LINODE_OBJECT_STORAGE_ENDPOINT,
-    sslEnabled: true,
-    s3ForcePathStyle: false,
-    credentials: new Credentials({
-        accessKeyId: process.env.LINODE_OBJECT_STORAGE_ACCESS_KEY_ID,
-        secretAccessKey: process.env.LINODE_OBJECT_STORAGE_SECRET_ACCESS_KEY,
-    }),
-});
+try {
+    // Create our S3 Client
+    const s3Client = new S3({
+        region: process.env.LINODE_OBJECT_STORAGE_REGION,
+        endpoint: process.env.LINODE_OBJECT_STORAGE_ENDPOINT,
+        sslEnabled: true,
+        s3ForcePathStyle: false,
+        credentials: new Credentials({
+            accessKeyId: process.env.LINODE_OBJECT_STORAGE_ACCESS_KEY_ID || "",
+            secretAccessKey: process.env.LINODE_OBJECT_STORAGE_SECRET_ACCESS_KEY || "",
+        }),
+    });
+} catch (e) {
+    console.log(e)
+}
 
 // Create our PRISMA Client
 const prisma = new PrismaClient();
 
+// Create our Router
 const imagesRoutes: Router = Router();
 
+/**
+ * @route   GET api/images
+ * @desc    Get all images
+ * @access  Public
+ * @return  JSON
+ * @status  200
+ **/
 imagesRoutes.get('/:id',  async (req: Request, res: Response) => {
     const id = req.params.id;
 
@@ -41,12 +56,20 @@ imagesRoutes.get('/:id',  async (req: Request, res: Response) => {
     const image = await prisma.image.findFirst({
         where: {
             photo_id: id
-        },
+        }
+
     });
 
     res.json({status: true, image: image});
 });
 
+/**
+ * @route   GET api/images
+ * @desc    Get all images
+ * @access  Public
+ * @return  JSON
+ * @status  200
+ **/
 imagesRoutes.post('/getlikes',  async (req: Request, res: Response) => {
     const { id } = req.params;
 
@@ -59,6 +82,13 @@ imagesRoutes.post('/getlikes',  async (req: Request, res: Response) => {
     res.json({status: true, data: {image: images}});
 });
 
+/**
+ * @route   GET api/images
+ * @desc    Get all images
+ * @access  Public
+ * @return  JSON
+ * @status  200
+*/
 imagesRoutes.post('/getcomment',  async (req: Request, res: Response) => {
     const id = req.params.id;
 
@@ -66,15 +96,19 @@ imagesRoutes.post('/getcomment',  async (req: Request, res: Response) => {
     const comments = await prisma.comments.findMany({
         where: {
             photo_id: id
-        },
-        orderBy:{
-            timestamp: 'desc',
         }
     });
     console.log('Getting comments')
     res.json({status: true, data: {comments: comments}});
 });
 
+/**
+ * @route   GET api/images
+ * @desc    Get all images
+ * @access  Public
+ * @return  JSON
+ * @status  200
+ */
 imagesRoutes.post('/addcomment',  async (req: Request, res: Response) => {
     const { imageid, userid, comment, timestamp } = req.body;
 
@@ -83,10 +117,10 @@ imagesRoutes.post('/addcomment',  async (req: Request, res: Response) => {
             user_id: userid,
             photo_id: imageid,
             comment: comment,
-            timestamp: timestamp
+            timestamp: new Date(timestamp)
         }
     });
-    console.log(`Comment Added!` + timestamp);
+    console.log(`Comment Added!`);
     res.json({ status: true, data: { comments: comments }});
 });
 
@@ -125,12 +159,16 @@ imagesRoutes.post('/:id/dislike',  async (req: Request, res: Response) => {
 });
 
 imagesRoutes.post('/upload', upload.single('image'), async (req: Request, res: Response) => {
-    const file = req.file; 
+    const file: Express.Multer.File = req.file;
+
+    if (!file) {
+        return res.status(400).json({ status: false, message: "No file uploaded" });
+    }
 
     console.log(file);
     console.log(req);
 
-    const fileBuffer = await sharp(file?.buffer)
+    const fileBuffer = await sharp(file.buffer)
         .resize({ height: 1350, width: 1080, fit: "contain" })
         .toBuffer();
 
