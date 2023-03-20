@@ -109,38 +109,58 @@ imagesRoutes.post('/addcomment',  async (req: Request, res: Response) => {
 });
 
 imagesRoutes.post('/:id/like',  async (req: Request, res: Response) => {
-    // const { imageid, likenum} = req.body;
     const id = req.params.id;
-
-    const likeout = await prisma.image.update({
-        where: {
-            photo_id: id,
-        },
-        data: {  
-                likes: {
-                    increment: 1
-                }      
-        }
+  
+    const image = await prisma.image.findUnique({
+      where: {
+        photo_id: id
+      }
     });
-    res.json({ status: true, data: { likeout: likeout }});
-});
+  
+    if (!image) {
+      res.status(404).json({ error: 'Image not found' });
+      return;
+    }
+  
+    const updatedImage = await prisma.image.update({
+      where: {
+        photo_id: id
+      },
+      data: {
+        likes: image.likes + 1
+      }
+    });
+  
+    res.json(updatedImage);
+  });
+  
 
 imagesRoutes.post('/:id/dislike',  async (req: Request, res: Response) => {
-    // const { imageid, likenum} = req.body;
-    const id = req.params.id;
+  const id = req.params.id;
 
-    const likeout = await prisma.image.update({
-        where: {
-            photo_id: id,
-        },
-        data: {  
-                likes: {
-                    decrement: 1
-                }      
-        }
-    });
-    res.json({ status: true, data: { likeout: likeout }});
+  const image = await prisma.image.findUnique({
+    where: {
+      photo_id: id
+    }
+  });
+
+  if (!image) {
+    res.status(404).json({ error: 'Image not found' });
+    return;
+  }
+
+  const updatedImage = await prisma.image.update({
+    where: {
+      photo_id: id
+    },
+    data: {
+      likes: image.likes - 1
+    }
+  });
+
+  res.json(updatedImage);
 });
+
 
 imagesRoutes.post('/upload', upload.single('image'), async (req: Request, res: Response) => {
     const file: Express.Multer.File | undefined = req.file;
