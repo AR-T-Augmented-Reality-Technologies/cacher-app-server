@@ -14,7 +14,7 @@ app.use(express.json());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-const allowlist = ['http://localhost:3000', 'localhost', 'http://127.0.0.1:3000'];
+const allowlist = ['http://cacherapp.com', 'http://localhost:3000', 'localhost', 'http://127.0.0.1:3000'];
 
 const corsOptionsDelegate = (req: Request, callback: any) => {
     let corsOptions;
