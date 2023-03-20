@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { getHashedPassword_async, checkPassword, generateAccessToken }  from "../middleware/users.middleware";
 import { calculateUserAge } from "../helpers/users.helper";
+
 export interface CreateUserType {
     username: string,
     firstname: string,
@@ -24,8 +25,8 @@ export interface LoginUserType {
     email: string,
     unhashed_password: string
 }
-
 /**
+
  * @class UserService
  * @description This class is used to handle all user related database queries.
  * @param {PrismaClient} prisma - The prisma client object.
