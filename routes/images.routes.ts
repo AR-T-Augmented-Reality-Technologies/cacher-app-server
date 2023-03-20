@@ -41,8 +41,7 @@ imagesRoutes.get('/:id',  async (req: Request, res: Response) => {
     const image = await prisma.image.findFirst({
         where: {
             photo_id: id
-        }
-
+        },
     });
 
     res.json({status: true, image: image});
@@ -67,6 +66,9 @@ imagesRoutes.post('/getcomment',  async (req: Request, res: Response) => {
     const comments = await prisma.comments.findMany({
         where: {
             photo_id: id
+        },
+        orderBy:{
+            timestamp: 'desc',
         }
     });
     console.log('Getting comments')
@@ -81,10 +83,10 @@ imagesRoutes.post('/addcomment',  async (req: Request, res: Response) => {
             user_id: userid,
             photo_id: imageid,
             comment: comment,
-            timestamp: new Date(timestamp)
+            timestamp: timestamp
         }
     });
-    console.log(`Comment Added!`);
+    console.log(`Comment Added!` + timestamp);
     res.json({ status: true, data: { comments: comments }});
 });
 
