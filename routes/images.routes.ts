@@ -34,7 +34,7 @@ const imagesRoutes: Router = Router();
  * @status  200
  **/
 imagesRoutes.get('/:id',  async (req: Request, res: Response) => {
-    const id = req.params.id;
+    const id = parseInt(req.params.id);
 
     // Get the Imageid
     const image = await prisma.image.findFirst({
@@ -54,8 +54,8 @@ imagesRoutes.get('/:id',  async (req: Request, res: Response) => {
  * @return  JSON
  * @status  200
  **/
-imagesRoutes.post('/getlikes',  async (req: Request, res: Response) => {
-    const { id } = req.params;
+imagesRoutes.post('/:id/getlikes',  async (req: Request, res: Response) => {
+    const id = parseInt(req.params.id);
 
     // Get the Imageid
     const images = await prisma.image.findFirst({
@@ -73,8 +73,8 @@ imagesRoutes.post('/getlikes',  async (req: Request, res: Response) => {
  * @return  JSON
  * @status  200
 */
-imagesRoutes.post('/getcomment',  async (req: Request, res: Response) => {
-    const id = req.params.id;
+imagesRoutes.post('/:id/getcomment',  async (req: Request, res: Response) => {
+    const id = parseInt(req.params.id);
 
     // Get the Imageid
     const comments = await prisma.comments.findMany({
@@ -109,7 +109,7 @@ imagesRoutes.post('/addcomment',  async (req: Request, res: Response) => {
 });
 
 imagesRoutes.post('/:id/like',  async (req: Request, res: Response) => {
-    const id = req.params.id;
+    const id = parseInt(req.params.id);
   
     const image = await prisma.image.findUnique({
       where: {
@@ -136,7 +136,7 @@ imagesRoutes.post('/:id/like',  async (req: Request, res: Response) => {
   
 
 imagesRoutes.post('/:id/dislike',  async (req: Request, res: Response) => {
-  const id = req.params.id;
+  const id = parseInt(req.params.id);
 
   const image = await prisma.image.findUnique({
     where: {
