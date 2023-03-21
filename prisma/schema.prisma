@@ -44,14 +44,15 @@ model ages {
 }
 
 model image {
-  photo_id     String        @id @db.VarChar(255)
-  image        String        @db.VarChar(255)
+  photo_id     Int          @unique(map: "page_id")
+  image        String       @db.VarChar(255)
   likes        Int
   num_comments Int
-  caption      String        @db.VarChar(255)
-  upload_date  DateTime      @db.DateTime
-  uploaded_by  uploaded_by[]
+  caption      String       @db.Text
+  upload_date  DateTime     @db.DateTime
+  uploaded_by  uploaded_by?
   comments     comments[]
+  page         page         @relation(fields: [photo_id], references: [page_id], onDelete: NoAction, onUpdate: NoAction, map: "image_ibfk_1")
 }
 
 model managed_by {
@@ -70,6 +71,7 @@ model page {
   pages           pages            @relation(fields: [page_collection], references: [page_collection], onDelete: NoAction, onUpdate: NoAction, map: "page_ibfk_1")
   page_options    page_options[]
   reported_posts  reported_posts[]
+  image           image?
 
   @@index([page_collection], map: "page_collection")
 }
@@ -91,8 +93,8 @@ model pages {
   number_of_pages Int
   page            page[]
   scrapbook       scrapbook @relation(fields: [scrapbook_id], references: [scrapbook_id], onDelete: NoAction, onUpdate: NoAction, map: "pages_ibfk_1")
-  @@index([scrapbook_id], map: "scrapbook_id")
 
+  @@index([scrapbook_id], map: "scrapbook_id")
 }
 
 model preoccupied {
@@ -112,11 +114,11 @@ model roles {
 }
 
 model uploaded_by {
-  id       Int    @id @default(autoincrement())
-  photo_id String @db.VarChar(255)
+  id       Int   @id @default(autoincrement())
+  photo_id Int   @unique(map: "page_id")
   user_id  Int
-  image    image  @relation(fields: [photo_id], references: [photo_id], onDelete: NoAction, onUpdate: NoAction, map: "uploaded_by_ibfk_1")
-  users    users  @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "uploaded_by_ibfk_2")
+  image    image @relation(fields: [photo_id], references: [photo_id], onDelete: Cascade, onUpdate: NoAction, map: "uploaded_by_ibfk_1")
+  users    users @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "uploaded_by_ibfk_2")
 
   @@index([photo_id], map: "photo_id")
   @@index([user_id], map: "user_id")
@@ -151,22 +153,22 @@ model blocked {
 model comments {
   comment_id     Int              @id @default(autoincrement())
   user_id        Int
-  photo_id       String           @db.VarChar(255)
-  comment        String           @db.VarChar(255)
+  photo_id       Int              
+  comment        String           @db.Text
   timestamp      DateTime         @db.DateTime
   users          users            @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "comments_ibfk_1")
   image          image            @relation(fields: [photo_id], references: [photo_id], onDelete: NoAction, onUpdate: NoAction, map: "comments_ibfk_2")
   reply_comments reply_comments[]
 
   @@index([user_id], map: "user_id")
-  @@index([photo_id], map: "photo_id")
+  @@index([photo_id], map: "page_id")
 }
 
 model reply_comments {
   replycomment_id Int      @id @default(autoincrement())
   user_id         Int
   comment_id      Int
-  comment         String   @db.VarChar(255)
+  comment         String   @db.Text
   timestamp       DateTime @db.Date
 
   users    users    @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "reply_comments_ibfk_1")
