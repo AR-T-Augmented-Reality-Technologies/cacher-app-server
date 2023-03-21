@@ -44,7 +44,7 @@ model ages {
 }
 
 model image {
-  photo_id     String        @id @db.VarChar(255)
+  photo_id     Int           @id @default(autoincrement())
   image        String        @db.VarChar(255)
   likes        Int
   num_comments Int
@@ -115,11 +115,11 @@ model roles {
 }
 
 model uploaded_by {
-  id       Int    @id @default(autoincrement())
-  photo_id String @db.VarChar(255)
+  id       Int   @id @default(autoincrement())
+  photo_id Int
   user_id  Int
-  image    image  @relation(fields: [photo_id], references: [photo_id], onDelete: NoAction, onUpdate: NoAction, map: "uploaded_by_ibfk_1")
-  users    users  @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "uploaded_by_ibfk_2")
+  image    image @relation(fields: [photo_id], references: [photo_id], onDelete: NoAction, onUpdate: NoAction, map: "uploaded_by_ibfk_1")
+  users    users @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "uploaded_by_ibfk_2")
 
   @@index([photo_id], map: "photo_id")
   @@index([user_id], map: "user_id")
@@ -154,7 +154,7 @@ model blocked {
 model comments {
   comment_id     Int              @id @default(autoincrement())
   user_id        Int
-  photo_id       String           @db.VarChar(255)
+  photo_id       Int
   comment        String           @db.VarChar(255)
   timestamp      DateTime         @db.DateTime
   users          users            @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "comments_ibfk_1")
