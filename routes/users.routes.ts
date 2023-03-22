@@ -22,7 +22,7 @@ usersRoutes.post('/create', async (req: Request, res: Response) => {
         lastname: lastname,
         email: email,
         password: password,
-        dob: dob
+        dob: dob,
     });
 
     res.json(query_response);

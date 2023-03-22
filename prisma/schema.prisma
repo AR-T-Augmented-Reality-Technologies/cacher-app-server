@@ -10,8 +10,8 @@ datasource db {
 model scrapbook {
   scrapbook_id  Int         @id @unique @default(autoincrement())
   location      String      @db.VarChar(255)
-  managed_by_id managed_by?
   images        image[]
+  managed_by_id managed_by?
 }
 
 model image {
@@ -20,12 +20,14 @@ model image {
   likes          Int              @default(0)
   num_comments   Int              @default(0)
   caption        String           @db.VarChar(255)
-  upload_date    DateTime         @db.DateTime
-  uploaded_by    uploaded_by[]
-  comments       comments[]
-  reported_posts reported_posts[]
-  scrapbook      scrapbook?       @relation(fields: [scrap_id], references: [scrapbook_id])
+  upload_date    DateTime         @db.DateTime(0)
   scrap_id       Int?
+  comments       comments[]
+  scrapbook      scrapbook?       @relation(fields: [scrap_id], references: [scrapbook_id])
+  reported_posts reported_posts[]
+  uploaded_by    uploaded_by[]
+
+  @@index([scrap_id], map: "image_scrap_id_fkey")
 }
 
 model users {
@@ -35,13 +37,14 @@ model users {
   user_email     String           @db.VarChar(255)
   user_password  String           @db.VarChar(255)
   user_username  String           @default("guest") @db.VarChar(255)
+  profile_pic    String?          @db.VarChar(255)
   ages           ages[]
+  comments       comments[]
   managed_by     managed_by[]
   private_user   private_user[]
+  reported_posts reported_posts[]
   roles          roles[]
   uploaded_by    uploaded_by[]
-  comments       comments[]
-  reported_posts reported_posts[]
 }
 
 model ages {
@@ -104,9 +107,9 @@ model comments {
   user_id    Int
   photo_id   Int
   comment    String   @db.VarChar(255)
-  timestamp  DateTime @db.DateTime
+  timestamp  DateTime @db.DateTime(0)
   users      users    @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "comments_ibfk_1")
-  image      image?   @relation(fields: [photo_id], references: [photo_id], onDelete: NoAction, onUpdate: NoAction, map: "comments_ibfk_2")
+  image      image    @relation(fields: [photo_id], references: [photo_id], onDelete: NoAction, onUpdate: NoAction, map: "comments_ibfk_2")
 
   @@index([user_id], map: "user_id")
   @@index([photo_id], map: "photo_id")
@@ -115,9 +118,12 @@ model comments {
 model reported_posts {
   reportid       Int     @id @default(autoincrement())
   reporter_id    Int
-  photo_id       Int
   issue_resolved Boolean
   reason         String  @db.VarChar(255)
+  photo_id       Int
   users          users   @relation(fields: [reporter_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "reported_posts_ibfk_1")
-  image          image?  @relation(fields: [photo_id], references: [photo_id], onDelete: NoAction, onUpdate: NoAction, map: "reported_posts_ibfk_2")
+  image          image   @relation(fields: [photo_id], references: [photo_id], onDelete: NoAction, onUpdate: NoAction, map: "reported_posts_ibfk_2")
+
+  @@index([reporter_id], map: "reported_posts_ibfk_1")
+  @@index([photo_id], map: "reported_posts_ibfk_2")
 }

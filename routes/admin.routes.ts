@@ -66,4 +66,15 @@ adminRoutes.post('/getScrap',  async (req: Request, res: Response) => {
     });
     res.json({ status: true, data: { scrapcount: scrapcount }});
 });
+
+adminRoutes.post('/:id/checkAdmin',  async (req: Request, res: Response) => {
+    const id = parseInt(req.params.id);
+    const admin = await prisma.roles.findFirstOrThrow({
+        where: {
+            user_id : id
+        },
+
+    });
+    res.json({ status: true, data: { admin: admin }});
+});
 export default adminRoutes;
