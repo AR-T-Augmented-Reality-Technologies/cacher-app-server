@@ -169,9 +169,6 @@ imagesRoutes.post('/upload', upload.single('image'), async (req: Request, res: R
         return res.status(400).json({ status: false, message: "No file uploaded" });
     }
 
-    console.log(file);
-    console.log(req);
-
     const fileBuffer = await sharp(file.buffer)
         .resize({ height: 1350, width: 1080, fit: "contain" })
         .toBuffer();
@@ -207,22 +204,48 @@ imagesRoutes.post('/upload', upload.single('image'), async (req: Request, res: R
 
         // Send the upload to S3
         const response = await s3Client.upload(uploadParams).promise();
-        console.log(response);
-        console.log(response.Location);
-
-        // Save the image name to the database. Any other req.body data can be saved here too but we don't need any other image data.
-        // const post = await prisma.posts.create({
-        //     data: {
-        //         imageName
-        //     }
-        // })
-
-        // res.send(post)
 
         res.json({status: true, uploadURL: response.Location});
     } catch (e) {
         console.log(e)
     }
+});
+
+imagesRoutes.post('/addImageToScrapbook', async (req: Request, res: Response) => {  
+  const scrapbookID = parseInt(req.body.scrapbookID);
+  const imageURL = req.body.imageURL as string;
+  const caption = req.body.caption as string;
+  const userID = parseInt(req.body.userID);
+
+  // Check if scrapbook has pages
+  const updatedScrapbook = await prisma.scrapbook.update({
+    where: {
+      scrapbook_id: scrapbookID
+    },
+    data: {
+      images: {
+        create: [{
+          image: imageURL,
+          likes: 0,
+          num_comments: 0,
+          caption: caption,
+          upload_date: new Date(),
+          uploaded_by: {
+            create: [
+              {
+                user_id: userID
+              }
+            ]
+          },
+        }]
+      }
+    },
+    include: { 
+      images: true
+    }
+  });
+  
+  res.json({status: true, data: {scrapbook: updatedScrapbook}});
 });
 
 export default imagesRoutes;
