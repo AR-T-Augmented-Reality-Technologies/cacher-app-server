@@ -8,10 +8,21 @@ datasource db {
 }
 
 model scrapbook {
-  scrapbook_id Int         @id @unique(map: "scrapbook_id") @default(autoincrement())
-  location     String      @db.VarChar(255)
+  scrapbook_id Int                @id @unique(map: "scrapbook_id") @default(autoincrement())
+  location     String             @db.VarChar(255)
   managed_by   managed_by?
-  pages        pages[]
+  images       scrapbook_images[]
+}
+
+model scrapbook_images {
+  id           Int       @id @default(autoincrement())
+  scrapbook_id Int
+  photo_id     Int
+  scrapbook    scrapbook @relation(fields: [scrapbook_id], references: [scrapbook_id], onDelete: NoAction, onUpdate: NoAction, map: "scrapbook_images_ibfk_1")
+  image        image     @relation(fields: [photo_id], references: [photo_id], onDelete: NoAction, onUpdate: NoAction, map: "scrapbook_images_ibfk_2")
+
+  @@index([scrapbook_id], map: "scrapbook_id")
+  @@index([photo_id], map: "photo_id")
 }
 
 model users {
@@ -22,14 +33,11 @@ model users {
   user_password  String           @db.VarChar(255)
   user_username  String           @default("guest") @db.VarChar(255)
   ages           ages[]
-  blocked        blocked[]
-  following      following[]
   managed_by     managed_by[]
   private_user   private_user[]
   roles          roles[]
   uploaded_by    uploaded_by[]
   comments       comments[]
-  reply_comments reply_comments[]
   reported_posts reported_posts[]
 }
 
@@ -44,16 +52,16 @@ model ages {
 }
 
 model image {
-  photo_id     Int           @id @default(autoincrement())
-  image        String        @db.VarChar(255)
-  likes        Int
-  num_comments Int
-  caption      String        @db.VarChar(255)
-  upload_date  DateTime      @db.DateTime
-  uploaded_by  uploaded_by[]
-  comments     comments[]
-  page_id      Int           @db.Int
-  page         page          @relation(fields: [page_id], references: [page_id])
+  photo_id         Int                @id @default(autoincrement())
+  image            String             @db.VarChar(255)
+  likes            Int
+  num_comments     Int
+  caption          String             @db.VarChar(255)
+  upload_date      DateTime           @db.DateTime
+  uploaded_by      uploaded_by[]
+  comments         comments[]
+  scrapbook_images scrapbook_images[]
+  reported_posts   reported_posts[]
 }
 
 model managed_by {
@@ -64,38 +72,6 @@ model managed_by {
   users        users     @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "managed_by_ibfk_2")
 
   @@index([user_id], map: "user_id")
-}
-
-model page {
-  page_id         Int              @id @default(autoincrement())
-  page_collection Int
-  pages           pages            @relation(fields: [page_collection], references: [page_collection], onDelete: NoAction, onUpdate: NoAction, map: "page_ibfk_1")
-  page_options    page_options[]
-  reported_posts  reported_posts[]
-  image           image[]
-
-  @@index([page_collection], map: "page_collection")
-}
-
-model page_options {
-  id               Int    @id @default(autoincrement())
-  page_id          Int
-  page_title       String @db.VarChar(255)
-  background_color String @db.VarChar(7)
-  orientation      String @db.VarChar(255)
-  page             page   @relation(fields: [page_id], references: [page_id], onDelete: NoAction, onUpdate: NoAction, map: "page_options_ibfk_1")
-
-  @@index([page_id], map: "page_id")
-}
-
-model pages {
-  page_collection Int       @id @default(autoincrement())
-  scrapbook_id    Int
-  number_of_pages Int
-  page            page[]
-  scrapbook       scrapbook @relation(fields: [scrapbook_id], references: [scrapbook_id], onDelete: NoAction, onUpdate: NoAction, map: "pages_ibfk_1")
-
-  @@index([scrapbook_id], map: "scrapbook_id")
 }
 
 model preoccupied {
@@ -133,58 +109,25 @@ model private_user {
   @@index([user_id], map: "user_id")
 }
 
-model following {
-  id        Int   @id @default(autoincrement())
-  user_id_1 Int
-  user_id_2 Int
-  users     users @relation(fields: [user_id_1], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "following_ibfk_1")
-
-  @@index([user_id_1], map: "user_id")
-}
-
-model blocked {
-  id        Int   @id @default(autoincrement())
-  user_id_1 Int
-  user_id_2 Int
-  users     users @relation(fields: [user_id_1], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "blocked_ibfk_1")
-
-  @@index([user_id_1], map: "user_id")
-}
-
 model comments {
-  comment_id     Int              @id @default(autoincrement())
-  user_id        Int
-  photo_id       Int
-  comment        String           @db.VarChar(255)
-  timestamp      DateTime         @db.DateTime
-  users          users            @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "comments_ibfk_1")
-  image          image            @relation(fields: [photo_id], references: [photo_id], onDelete: NoAction, onUpdate: NoAction, map: "comments_ibfk_2")
-  reply_comments reply_comments[]
+  comment_id Int      @id @default(autoincrement())
+  user_id    Int
+  photo_id   Int
+  comment    String   @db.VarChar(255)
+  timestamp  DateTime @db.DateTime
+  users      users    @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "comments_ibfk_1")
+  image      image?   @relation(fields: [photo_id], references: [photo_id], onDelete: NoAction, onUpdate: NoAction, map: "comments_ibfk_2")
 
   @@index([user_id], map: "user_id")
   @@index([photo_id], map: "photo_id")
 }
 
-model reply_comments {
-  replycomment_id Int      @id @default(autoincrement())
-  user_id         Int
-  comment_id      Int
-  comment         String   @db.VarChar(255)
-  timestamp       DateTime @db.Date
-
-  users    users    @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "reply_comments_ibfk_1")
-  comments comments @relation(fields: [comment_id], references: [comment_id], onDelete: NoAction, onUpdate: NoAction, map: "reply_comments_ibfk_2")
-
-  @@index([user_id], map: "user_id")
-  @@index([comment_id], map: "comment_id")
-}
-
 model reported_posts {
   reportid       Int     @id @default(autoincrement())
   reporter_id    Int
-  page_id        Int
+  photo_id       Int
   issue_resolved Boolean
   reason         String  @db.VarChar(255)
   users          users   @relation(fields: [reporter_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "reported_posts_ibfk_1")
-  page           page    @relation(fields: [page_id], references: [page_id], onDelete: NoAction, onUpdate: NoAction, map: "reported_posts_ibfk_2")
+  image          image?  @relation(fields: [photo_id], references: [photo_id], onDelete: NoAction, onUpdate: NoAction, map: "reported_posts_ibfk_2")
 }
