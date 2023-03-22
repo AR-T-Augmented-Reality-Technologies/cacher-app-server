@@ -24,7 +24,7 @@ model image {
   uploaded_by    uploaded_by[]
   comments       comments[]
   reported_posts reported_posts[]
-  scrapbook      scrapbook?       @relation(fields: [scrap_id], references: [scrapbook_id])
+  scrapbook      scrapbook?       @relation(fields: [scrap_id], references: [scrapbook_id], onDelete: Cascade, onUpdate: Cascade)
   scrap_id       Int?
 }
 

@@ -217,6 +217,11 @@ imagesRoutes.post('/addImageToScrapbook', async (req: Request, res: Response) =>
   const caption = req.body.caption as string;
   const userID = parseInt(req.body.userID);
 
+  // Check image is provided
+  if (!imageURL) {
+    return res.status(400).json({status: false, message: "No image URL provided"});
+  }
+
   // Check if scrapbook has pages
   const updatedScrapbook = await prisma.scrapbook.update({
     where: {
