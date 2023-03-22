@@ -222,6 +222,16 @@ imagesRoutes.post('/addImageToScrapbook', async (req: Request, res: Response) =>
     return res.status(400).json({status: false, message: "No image URL provided"});
   }
 
+  const checkScrapbookExists = await prisma.scrapbook.findUnique({
+    where: {
+        scrapbook_id: scrapbookID
+    }
+  });
+
+  if (!checkScrapbookExists) {
+    return res.status(400).json({status: false, message: `Scrapbook does not exist, supplied id was ${scrapbookID}`}); 
+  }
+
   // Check if scrapbook has pages
   const updatedScrapbook = await prisma.scrapbook.update({
     where: {
