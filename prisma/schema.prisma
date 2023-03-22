@@ -84,8 +84,8 @@ model uploaded_by {
   id       Int   @id @default(autoincrement())
   photo_id Int
   user_id  Int
-  image    image @relation(fields: [photo_id], references: [photo_id], onDelete: NoAction, onUpdate: NoAction, map: "uploaded_by_ibfk_1")
-  users    users @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "uploaded_by_ibfk_2")
+  image    image @relation(fields: [photo_id], references: [photo_id], onDelete: Cascade, onUpdate: NoAction, map: "uploaded_by_ibfk_1")
+  users    users @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "uploaded_by_ibfk_2")
 
   @@index([photo_id], map: "photo_id")
   @@index([user_id], map: "user_id")
