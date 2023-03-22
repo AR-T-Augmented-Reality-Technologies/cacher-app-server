@@ -8,21 +8,24 @@ datasource db {
 }
 
 model scrapbook {
-  scrapbook_id Int                @id @unique(map: "scrapbook_id") @default(autoincrement())
-  location     String             @db.VarChar(255)
-  managed_by   managed_by?
-  images       scrapbook_images[]
+  scrapbook_id  Int         @id @unique @default(autoincrement())
+  location      String      @db.VarChar(255)
+  managed_by_id managed_by?
+  images        image[]
 }
 
-model scrapbook_images {
-  id           Int       @id @default(autoincrement())
-  scrapbook_id Int
-  photo_id     Int
-  scrapbook    scrapbook @relation(fields: [scrapbook_id], references: [scrapbook_id], onDelete: NoAction, onUpdate: NoAction, map: "scrapbook_images_ibfk_1")
-  image        image     @relation(fields: [photo_id], references: [photo_id], onDelete: NoAction, onUpdate: NoAction, map: "scrapbook_images_ibfk_2")
-
-  @@index([scrapbook_id], map: "scrapbook_id")
-  @@index([photo_id], map: "photo_id")
+model image {
+  photo_id       Int              @id @default(autoincrement())
+  image          String           @db.VarChar(255)
+  likes          Int              @default(0)
+  num_comments   Int              @default(0)
+  caption        String           @db.VarChar(255)
+  upload_date    DateTime         @db.DateTime
+  uploaded_by    uploaded_by[]
+  comments       comments[]
+  reported_posts reported_posts[]
+  scrapbook      scrapbook?       @relation(fields: [scrap_id], references: [scrapbook_id])
+  scrap_id       Int?
 }
 
 model users {
@@ -49,19 +52,6 @@ model ages {
   users   users    @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "ages_ibfk_1")
 
   @@index([user_id], map: "user_id")
-}
-
-model image {
-  photo_id         Int                @id @default(autoincrement())
-  image            String             @db.VarChar(255)
-  likes            Int
-  num_comments     Int
-  caption          String             @db.VarChar(255)
-  upload_date      DateTime           @db.DateTime
-  uploaded_by      uploaded_by[]
-  comments         comments[]
-  scrapbook_images scrapbook_images[]
-  reported_posts   reported_posts[]
 }
 
 model managed_by {

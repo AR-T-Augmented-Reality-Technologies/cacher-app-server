@@ -1,0 +1,22 @@
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+Datasource "db": MySQL database "cacherdb" at "178.79.190.177:3306"
+
+- The migration `20230322014606_scrapbook_image` failed.
+- The migration `20230322014606_scrapbook_image` was modified after it was applied.
+- Drift detected: Your database schema is not in sync with your migration history.
+
+The following is a summary of the differences between the expected database schema given your migrations files, and the actual schema of the database.
+
+It should be understood as the set of changes to get from the expected schema to the actual schema.
+
+[*] Changed the `scrapbook_images` table
+  [-] Removed foreign key on columns (scrapbook_id)
+  [-] Removed foreign key on columns (photo_id)
+
+
+[?25l[2K[1G[36m?[39m [1mWe need to reset the MySQL database "cacherdb" at "178.79.190.177:3306"
+Do you want to continue? All data will be lost.[22m [90m»[39m [90m(y/N)[39m[2K[1G[2K[1G[32m√[39m [1mWe need to reset the MySQL database "cacherdb" at "178.79.190.177:3306"
+Do you want to continue? All data will be lost.[22m [90m...[39m no
+[?25h
+Reset cancelled.
