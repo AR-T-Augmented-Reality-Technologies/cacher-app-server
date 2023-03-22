@@ -76,5 +76,27 @@ scrapRoutes.post("/:id/deleteBook", async (req: Request, res: Response) => {
 });
 
 
+scrapRoutes.post("/:id/getBook", async (req: Request, res: Response) => {
+  const id = parseInt(req.params.id);
+  const deleted = await prisma.scrapbook.findFirst({
+    where: {
+      scrapbook_id: id
+    }
+  });
+
+  res.json({ status: true, data: { books: deleted } });
+});
+
+scrapRoutes.post("/:id/deletePreq", async (req: Request, res: Response) => {
+  const id = (req.params.id);
+  const deleted = await prisma.preoccupied.deleteMany({
+    where: {
+      closest_book: id
+    }
+  });
+  res.json({ status: true, data: { deleted: deleted } });
+});
+
+
 
 export default scrapRoutes;
