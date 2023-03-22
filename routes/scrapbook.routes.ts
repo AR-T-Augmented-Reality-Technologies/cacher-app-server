@@ -12,6 +12,26 @@ const prisma = new PrismaClient();
 
 const scrapRoutes: Router = Router();
 
+scrapRoutes.get('/:id', async (req: Request, res: Response) => {
+    const id = parseInt(req.params.id);
+
+    const scrapbook = await prisma.scrapbook.findUnique({
+        where: {
+            scrapbook_id: id
+        },
+        include: {
+          images: true
+        }
+    });
+
+    if (!scrapbook) {
+        res.status(404).json({status: false, error: 'Scrapbook not found' });
+        return;
+    }
+
+    res.json({ status: true, data: { scrapbook: scrapbook } });
+});
+
 scrapRoutes.post("/getBooks", async (req: Request, res: Response) => {
     const scraps = await prisma.scrapbook.findMany({});
     res.json({ status: true, data: { books: scraps } });
