@@ -68,7 +68,7 @@ model managed_by {
 
 model page {
   page_id         Int              @id @default(autoincrement())
-  page_collection String           @db.VarChar(255)
+  page_collection Int
   pages           pages            @relation(fields: [page_collection], references: [page_collection], onDelete: NoAction, onUpdate: NoAction, map: "page_ibfk_1")
   page_options    page_options[]
   reported_posts  reported_posts[]
@@ -89,7 +89,7 @@ model page_options {
 }
 
 model pages {
-  page_collection String    @id @db.VarChar(255)
+  page_collection Int       @id @default(autoincrement())
   scrapbook_id    Int
   number_of_pages Int
   page            page[]
