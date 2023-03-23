@@ -112,6 +112,19 @@ export class UserService {
             }
         });
 
+        const _user_roles = await this._prisma.roles.create({
+            data: {
+                users: {
+                    connect: {
+                        user_id: _new_user.user_id,
+                    }
+                },
+                roles_name: "user",
+                roles_description: "User",
+                roles_serialized: ""
+            }
+        });
+
         return { status: true, data: { _new_user, _user_age }};
     };
 
