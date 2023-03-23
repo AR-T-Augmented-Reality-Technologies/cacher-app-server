@@ -99,8 +99,7 @@ export class UserService {
                 user_lastname: _user_data.lastname,
                 user_email: _user_data.email,
                 user_password: _hashed_password,
-                user_username: _user_data.username,
-                profile_pic: ""
+                user_username: _user_data.username
             }
         });
 
