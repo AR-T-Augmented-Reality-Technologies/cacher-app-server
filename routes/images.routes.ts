@@ -170,7 +170,7 @@ imagesRoutes.post('/upload', upload.single('image'), async (req: Request, res: R
     }
 
     const fileBuffer = await sharp(file.buffer)
-        .resize({ height: 1350, width: 1080, fit: "contain" })
+        .resize({ height: 2520, width: 1080, fit: "fill" })
         .toBuffer();
 
     // Configure the upload details to send to S3
@@ -222,6 +222,8 @@ imagesRoutes.post('/addImageToScrapbook', async (req: Request, res: Response) =>
     return res.status(400).json({status: false, message: "No image URL provided"});
   }
 
+  console.log(`Checking if scrapbook exists with id ${scrapbookID}`);
+  
   const checkScrapbookExists = await prisma.scrapbook.findUnique({
     where: {
         scrapbook_id: scrapbookID
@@ -232,30 +234,45 @@ imagesRoutes.post('/addImageToScrapbook', async (req: Request, res: Response) =>
     return res.status(400).json({status: false, message: `Scrapbook does not exist, supplied id was ${scrapbookID}`}); 
   }
 
-  // Check if scrapbook has pages
+  const image = await prisma.image.create({
+    data: {
+      image: imageURL,
+      likes: 0,
+      num_comments: 0,
+      caption: caption,
+      upload_date: new Date(),
+    }
+  });
+
+  // Create uploaded_by record
+  const uploadedBy = await prisma.uploaded_by.create({
+    data: {
+      users: {
+        connect: {
+          user_id: userID
+        }
+      },
+      image: {
+        connect: {
+          photo_id: image.photo_id
+        }
+      }
+    },
+  });
+
+  // Add image to scrapbook and return the updated scrapbook with theimages
   const updatedScrapbook = await prisma.scrapbook.update({
     where: {
       scrapbook_id: scrapbookID
     },
     data: {
       images: {
-        create: [{
-          image: imageURL,
-          likes: 0,
-          num_comments: 0,
-          caption: caption,
-          upload_date: new Date(),
-          uploaded_by: {
-            create: [
-              {
-                user_id: userID
-              }
-            ]
-          },
-        }]
+        connect: {
+          photo_id: image.photo_id
+        }
       }
     },
-    include: { 
+    include: {
       images: true
     }
   });
