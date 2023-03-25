@@ -37,7 +37,7 @@ model users {
   user_email     String           @db.VarChar(255)
   user_password  String           @db.VarChar(255)
   user_username  String           @default("guest") @db.VarChar(255)
-  profile_pic    String?          @db.VarChar(255)
+  profile_pic    String           @default("https://ar-t-cacher-app-s3.eu-central-1.linodeobjects.com/profiles/user.png") @db.VarChar(255)
   ages           ages[]
   comments       comments[]
   managed_by     managed_by[]
@@ -75,7 +75,7 @@ model preoccupied {
 model roles {
   id                Int    @id @default(autoincrement())
   user_id           Int
-  roles_name        String @db.VarChar(255)
+  roles_name        String @default("User") @db.VarChar(255)
   roles_serialized  String @db.VarChar(255)
   roles_description String @db.VarChar(255)
   users             users  @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "roles_ibfk_1")
