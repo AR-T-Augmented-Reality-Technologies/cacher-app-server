@@ -70,6 +70,33 @@ usersRoutes.post('/:id/updateProfileData', authenticateToken, async (req: Reques
 });
 
 /**
+ * Update user profile picture
+ * @param {Request} req
+ * @param {Response} res
+ * @returns {Promise<Response>}
+ * @route PUT /users/:id/updateProfilePicture
+ * @access Private
+ * @description Update user profile picture
+ * @example http://localhost:3000/users/1/updateProfilePicture
+ */
+usersRoutes.put('/:id/updateProfilePicture', authenticateToken, async (req: Request, res: Response) => {
+    // Get the user id
+    const id = parseInt(req.params.id);
+    console.log(id);
+
+    // Get the image URL response from S3 that the client sends
+    const imageURL = req.body.imageURL;
+    console.log(imageURL);
+
+    // Update the user's profile picture
+    const query_response = await userService.UpdateProfilePicture(id, imageURL);
+
+    // Return the response
+    res.json(query_response);
+});
+
+
+/**
  * Delete user
  * @param {Request} req
  * @param {Response} res

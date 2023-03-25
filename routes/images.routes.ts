@@ -211,6 +211,55 @@ imagesRoutes.post('/upload', upload.single('image'), async (req: Request, res: R
     }
 });
 
+imagesRoutes.post('/uploadProfilePic', upload.single('image'), async (req: Request, res: Response) => {
+  const file: Express.Multer.File | undefined = req.file;
+
+  if (!file) {
+      return res.status(400).json({ status: false, message: "No file uploaded" });
+  }
+
+  const fileBuffer = await sharp(file.buffer)
+      .resize({ height: 1080, width: 1080, fit: "cover" })
+      .toBuffer();
+
+  // Configure the upload details to send to S3
+  const fileName = generateFileName();
+  const bucketName = process.env.LINODE_OBJECT_STORAGE_BUCKET_NAME;
+
+  if (!bucketName) {
+      throw new Error('LINODE_OBJECT_STORAGE_BUCKET_NAME environment variable not defined');
+  }
+
+  const uploadParams = {
+      Bucket: bucketName,
+      Body: fileBuffer,
+      Key: `profiles/${fileName}`,
+      ACL: 'public-read',
+      ContentType: file.mimetype
+  };
+
+  try {
+      // Create our S3 Client
+      const s3Client = new S3({
+          region: process.env.LINODE_OBJECT_STORAGE_REGION,
+          endpoint: process.env.LINODE_OBJECT_STORAGE_ENDPOINT,
+          sslEnabled: true,
+          s3ForcePathStyle: false,
+          credentials: new Credentials({
+              accessKeyId: process.env.LINODE_OBJECT_STORAGE_ACCESS_KEY_ID || "",
+              secretAccessKey: process.env.LINODE_OBJECT_STORAGE_SECRET_ACCESS_KEY || "",
+          }),
+      });
+
+      // Send the upload to S3
+      const response = await s3Client.upload(uploadParams).promise();
+
+      res.json({status: true, uploadURL: response.Location});
+  } catch (e) {
+      console.log(e)
+  }
+});
+
 imagesRoutes.post('/addImageToScrapbook', async (req: Request, res: Response) => {  
   const scrapbookID = parseInt(req.body.scrapbookID);
   const imageURL = req.body.imageURL as string;

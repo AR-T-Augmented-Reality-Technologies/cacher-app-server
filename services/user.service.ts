@@ -316,6 +316,7 @@ export class UserService {
     }
 
     async UpdateProfilePicture(id: number, imageURL: string) {
+        console.log("Updating profile picture for user: " + id + " to:" + imageURL)
         const _user = await this._prisma.users.findFirst({
             where: { user_id: id }
         });
