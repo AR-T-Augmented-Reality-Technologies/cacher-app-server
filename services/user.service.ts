@@ -315,4 +315,23 @@ export class UserService {
         return {status: check, data: { success: check, user: user, token: accessToken }};
     }
 
+    async UpdateProfilePicture(id: number, imageURL: string) {
+        const _user = await this._prisma.users.findFirst({
+            where: { user_id: id }
+        });
+
+        if (_user == null || _user == undefined) {
+            return { status: false, data: { message: "FAILED TO FIND USER" }};
+        }
+
+        const _updatedUser = await this._prisma.users.update({
+            where: { user_id: id },
+            data: { 
+                profile_pic: imageURL 
+            }
+        });
+
+        return { status: true, data: _updatedUser };
+    }
+
 };
