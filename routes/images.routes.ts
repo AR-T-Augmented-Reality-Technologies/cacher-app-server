@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import { getHashedPassword_async, checkPassword, generateAccessToken } from "../middleware/users.middleware";
+import { authenticateToken } from "../middleware/users.middleware";
 import { PrismaClient } from '@prisma/client'
 import { calculateUserAge } from "../helpers/users.helper";
 import AWS, { Credentials } from 'aws-sdk';
@@ -45,6 +45,48 @@ imagesRoutes.get('/:id',  async (req: Request, res: Response) => {
     });
 
     res.json({status: true, image: image});
+});
+
+/**
+ * Get all images from user with user_id === `id`
+ * @route   GET api/images
+ * @desc    Get all images
+ * @access  Public
+ * @return  JSON
+ * @status  200
+ * @param   id
+ * @param   page
+ * @param   limit
+ */
+imagesRoutes.post('/user/:id', authenticateToken, async (req: Request, res: Response) => {
+    const id: number = parseInt(req.params.id);
+    const page: number = parseInt(req.body.page);
+    const limit: number = parseInt(req.body.limit);
+
+    const skip: number = (page - 1) * limit;
+
+    // Get the Imageid
+    const images = await prisma.image.findMany({
+        where: {
+            uploaded_by: {
+                every: {
+                  users: {
+                    user_id: id
+                  }
+                }
+            }
+        },
+        select: {
+            photo_id: true,
+            image: true,
+            likes: true
+        },
+        skip: skip,
+        take: limit
+    });
+
+    // Return the images
+    res.json({status: true, images: images});
 });
 
 /**
