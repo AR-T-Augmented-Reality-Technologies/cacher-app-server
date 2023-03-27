@@ -212,7 +212,7 @@ imagesRoutes.post('/upload', upload.single('image'), async (req: Request, res: R
     }
 
     const fileBuffer = await sharp(file.buffer)
-        .resize({ height: 2520, width: 1080, fit: "fill" })
+        .resize({ height: 2520, width: 1080, fit: "contain" })
         .toBuffer();
 
     // Configure the upload details to send to S3
