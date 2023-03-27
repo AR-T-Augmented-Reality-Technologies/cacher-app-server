@@ -129,6 +129,10 @@ export class UserService {
     };
 
     async ReadUser(id: number) {
+        if (id == null) {
+            return { status: false, data: { message: "USER ID NOT PROVIDED" }};
+        }
+        
         // Get the user from the database
         const _user = await this._prisma.users.findFirst({
             where: { user_id: id }
