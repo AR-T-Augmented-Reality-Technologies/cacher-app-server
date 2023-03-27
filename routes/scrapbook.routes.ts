@@ -33,19 +33,32 @@ scrapRoutes.get('/:id', async (req: Request, res: Response) => {
 });
 
 scrapRoutes.post("/getBooks", async (req: Request, res: Response) => {
-  const scraps = await prisma.scrapbook.findMany({});
+  const scraps = await prisma.scrapbook.findMany({ include: { images: true, managed_by_id: true }});
   res.json({ status: true, data: { books: scraps } });
 });
 
 scrapRoutes.post("/setBooks", async (req: Request, res: Response) => {
-  const { loc } = req.body;
+  const { loc, user_id } = req.body;
 
   try {
     const books = await prisma.scrapbook.create({
       data: {
         location: loc,
+        managed_by_id: {
+          create: {
+            user_id: user_id,
+          },
+        }
       },
     });
+
+    const managed_by = await prisma.managed_by.create({
+      data: {
+        scrapbook_id: books.scrapbook_id,
+        user_id: 1,
+      },
+    });
+
     res.json({ status: true, data: { books: books } });
   } catch (error: any) {
     if (error.code === "P2002") {
